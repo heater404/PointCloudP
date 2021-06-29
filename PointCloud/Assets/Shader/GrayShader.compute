@@ -1,0 +1,65 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel GrayKernel
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+float width;//列数
+float height;//行数
+float max;
+float min;
+
+RWStructuredBuffer<float> buffer;//输入的当前最新的点云各点的半径值
+
+RWTexture2D<float4> renderTexture;//相位图纹理
+
+//色调H：用角度度量，取值范围为0°～360°，从红色开始按逆时针方向计算，红色为0°，绿色为120°,蓝色为240° 黄色为60°，青色为180°,品红为300°。
+//饱和度S：表示颜色接近光谱色的程度。一种颜色，可以看成是某种光谱色与白色混合的结果。其中光谱色所占的比例愈大，颜色接近光谱色的程度就愈高，颜色的饱和度也就愈高。
+//饱和度高，颜色则深而艳。光谱色的白光成分为0，饱和度达到最高。通常取值范围为0%～100%，值越大，颜色越饱和
+//明度V：明度表示颜色明亮的程度，对于光源色，明度值与发光体的光亮度有关；对于物体色，此值和物体的透射比或反射比有关。通常取值范围为0% （黑）到100% （白）
+float4 HSVToRGB(float h, float s, float v) {
+
+	uint hi = floor(h / 60);//分成6块主色域
+	float f = (h / 60) - hi;//主色域中的余量
+
+	float p = v * (1 - s);
+	float q = v * (1 - (f * s));
+	float t = v * (1 - (1 - f) * s);
+
+	float3 color[6] = {
+		float3(v, t, p),
+		float3(q, v, p),
+		float3(p, v, t),
+		float3(p, q, v),
+		float3(t, p, v),
+		float3(v, p, q)
+	};
+	return float4(color[hi], 1);
+}
+
+//将v归一化
+float Normalize(float v, float max, float min) {
+
+	//尽量避免使用条件判断，这里是为了避免出现0
+	//脚本程序内必须保证v没有超出范围，这里不对其进行保证
+	//if (v <= min)
+	//	v = min + 0.0001;
+	//return log10(1 + 10 * (v - min) / (max - min)) * 0.96;//非线性映射
+	//return pow((v-min)/(max-min), 0.2);
+	if (v < min)
+		return 0;
+	if (v > max)
+		return 1;
+
+	return ((v - min) / (max - min));
+}
+
+[numthreads(1, 1, 1)]
+void GrayKernel(uint3 id : SV_DispatchThreadID)
+{
+	// TODO: insert actual code here!
+	//Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+	uint i = id.x + (height - id.y - 1) * width; //纹理坐标的原点在左下角。故Y轴要取反
+	//颜色变换输入值必须为0~1，所以输入前需先进行归一化操作
+	float normal = Normalize(buffer[i], max, min);
+	renderTexture[id.xy] = HSVToRGB(0, 0, normal);
+}
