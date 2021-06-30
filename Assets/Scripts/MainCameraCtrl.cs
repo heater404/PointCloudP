@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainCameraCtrl : MonoBehaviour
 {
     public List<CameraParams> CamerasParams { get; set; } = new List<CameraParams>();
-
+    public Button[] ResetBtns;
     float miniViewWidth;
     float topMenuHeight;
 
@@ -14,6 +15,11 @@ public class MainCameraCtrl : MonoBehaviour
     {
         miniViewWidth = GameObject.Find("MiniView").GetComponent<RectTransform>().rect.width;
         topMenuHeight = GameObject.Find("TopMenu").GetComponent<RectTransform>().rect.height;
+
+        foreach (var reset in ResetBtns)
+        {
+            reset.onClick.AddListener(ResetCurrentCameraParam);
+        }
     }
 
     // Update is called once per frame
@@ -25,6 +31,18 @@ public class MainCameraCtrl : MonoBehaviour
         this.gameObject.GetComponent<Camera>().rect = new Rect(x, 0, w, h);
     }
 
+    public void ResetCurrentCameraParam()
+    {
+        foreach (var camera in Camera.allCameras)
+        {
+            if (camera.cullingMask == Camera.main.cullingMask)
+            {
+                Camera.main.transform.position = camera.transform.position;
+                Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+                Camera.main.orthographicSize = camera.orthographicSize;
+            }
+        }
+    }
 
     public void SetCameraParam(string targetLayer)
     {

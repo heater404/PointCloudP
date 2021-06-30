@@ -2,13 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ToolTipManager : MonoBehaviour
 {
+    public Button[] ClearBtns;
     Transform parent;
     void Awake()
     {
         parent = GameObject.Find("UICanvas").transform;
+        foreach (var clearBtn in ClearBtns)
+        {
+            clearBtn?.onClick.AddListener(DestoryCurrentToolTip);
+        }
     }
     public static ToolTipManager Instance()
     {
@@ -31,8 +37,21 @@ public class ToolTipManager : MonoBehaviour
         {
             if (res.Count > MaxToolTipsNumPerLayer)
             {
-                GameObject.DestroyImmediate(res[0]);
                 ToolTips.Remove(res[0]);
+                GameObject.DestroyImmediate(res[0]);
+            }
+        }
+    }
+
+    public void DestoryCurrentToolTip()
+    {
+        var res = ToolTips.FindAll(tool => tool.layer == (int)Mathf.Log(Camera.main.cullingMask, 2));
+        if (res != null)
+        {
+            ToolTips.RemoveAll(tool => tool.layer == (int)Mathf.Log(Camera.main.cullingMask, 2));
+            for (int i = 0; i < res.Count; i++)
+            {
+                GameObject.DestroyImmediate(res[i]);
             }
         }
     }
