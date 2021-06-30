@@ -12,10 +12,7 @@ public class ToolTip : MonoBehaviour
     private Func<string> updateToolTip;
     private void Awake()
     {
-        var parent = GameObject.Find("UICanvas").transform;
 
-        this.gameObject.transform.SetParent(parent);
-        this.gameObject.transform.SetSiblingIndex(0);//设置子物体的index
     }
 
     // Start is called before the first frame update
@@ -48,7 +45,6 @@ public class ToolTip : MonoBehaviour
         this.target = target;
         this.updateToolTip = updateToolTip;
         this.localPosition = position;
-        this.gameObject.SetActive(true);
     }
 
     private Vector3 LocalPositionToScreenPoint(Vector3 localPosition)

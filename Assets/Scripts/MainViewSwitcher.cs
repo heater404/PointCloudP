@@ -34,7 +34,7 @@ public class MainViewSwitcher : MonoBehaviour
     void SwitchToView(string name)
     {
         var layer = LayerMask.NameToLayer(name);
-        Camera.main.GetComponent<Camera>().cullingMask = 1 << layer;//开启layer层
+        Camera.main.GetComponent<MainCameraCtrl>().SetCameraParam(name);//开启layer层
         foreach (var ui in uis)
         {
             if (ui.layer != LayerMask.NameToLayer("UI"))

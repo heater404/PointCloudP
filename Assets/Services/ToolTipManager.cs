@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class ToolTipManager : MonoBehaviour
 {
+    Transform parent;
     void Awake()
     {
-        
+        parent = GameObject.Find("UICanvas").transform;
     }
     public static ToolTipManager Instance()
     {
@@ -18,10 +19,9 @@ public class ToolTipManager : MonoBehaviour
     public List<GameObject> ToolTips { get; private set; } = new List<GameObject>();
     public void Show(Func<string> updateToolTip, Vector3 position, GameObject target)
     {
-        var tooltip = (GameObject)Instantiate(Resources.Load("Prefabs/ToolTip", typeof(GameObject)));
-
+        var tooltip = (GameObject)Instantiate(Resources.Load("Prefabs/ToolTip", typeof(GameObject)), Vector3.zero, Quaternion.Euler(0, 0, 0), parent);
+        tooltip.transform.SetSiblingIndex(0);//设置子物体的index
         tooltip.GetComponent<ToolTip>().Show(updateToolTip, position, target);
-
         tooltip.layer = (int)Mathf.Log(Camera.main.cullingMask, 2);
         ToolTips.Add(tooltip);
 
