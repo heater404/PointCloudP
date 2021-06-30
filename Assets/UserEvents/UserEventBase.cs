@@ -80,13 +80,12 @@ public class UserEventBase : MonoBehaviour
             //再将本地坐标转换为像素坐标
             //(1.0 / comm.PixelColumn)表示一个像素占的大小
             Vector2Int sn = new Vector2Int((int)(newPoint.x / (1.0 / comm.PixelWidth)), (int)(newPoint.y / (1.0 / comm.PixelHeight)));
-            
-            this.gameObject.GetComponent<ToolTipManager>().Show(() =>
+            ToolTipManager.Instance().Show(() =>
             {
                 var data = helper.GetBufferData(sn);
 
                 return ToolTipFormat(sn, data);
-            }, localPoint);
+            }, localPoint, this.gameObject);
         }
     }
 

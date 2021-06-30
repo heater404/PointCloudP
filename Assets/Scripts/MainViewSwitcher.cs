@@ -28,6 +28,7 @@ public class MainViewSwitcher : MonoBehaviour
         {
             uis.Add(GameObject.Find("TopMenu").transform.GetChild(i).gameObject);
         }
+
     }
 
     void SwitchToView(string name)
@@ -43,6 +44,14 @@ public class MainViewSwitcher : MonoBehaviour
                 else
                     ui.SetActive(false);
             }
+        }
+
+        foreach (var tool in ToolTipManager.Instance().ToolTips)
+        {
+            if (tool.layer == layer)
+                tool.SetActive(true);
+            else
+                tool.SetActive(false);
         }
     }
 
