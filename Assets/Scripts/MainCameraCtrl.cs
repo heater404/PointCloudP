@@ -7,15 +7,16 @@ public class MainCameraCtrl : MonoBehaviour
 {
     public List<CameraParams> CamerasParams { get; set; } = new List<CameraParams>();
     public Button[] ResetBtns;
+    public RectTransform Left;
+    public RectTransform Top;
+    public RectTransform Right;
+    public RectTransform Bottom;
     float miniViewWidth;
     float topMenuHeight;
-
+    float colorBarWidth;
     // Use this for initialization
     void Start()
     {
-        miniViewWidth = GameObject.Find("MiniView").GetComponent<RectTransform>().rect.width;
-        topMenuHeight = GameObject.Find("TopMenu").GetComponent<RectTransform>().rect.height;
-
         foreach (var reset in ResetBtns)
         {
             reset.onClick.AddListener(ResetCurrentCameraParam);
@@ -25,10 +26,12 @@ public class MainCameraCtrl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var x = miniViewWidth / Screen.width;
-        var w = (Screen.width - miniViewWidth) / Screen.width;
-        var h = (Screen.height - topMenuHeight) / Screen.height;
-        this.gameObject.GetComponent<Camera>().rect = new Rect(x, 0, w, h);
+        var x = Left?.rect.width / Screen.width;
+        var y = Bottom?.rect.height / Screen.height;
+        var w = (Screen.width - Left?.rect.width - Right?.rect.width) / Screen.width;
+        var h = (Screen.height - Top?.rect.height) / Screen.height;
+        this.gameObject.GetComponent<Camera>().rect = new Rect
+            (x.HasValue ? x.Value : 0, y.HasValue ? y.Value : 0, w.HasValue ? w.Value : 1, h.HasValue ? h.Value : 1);
     }
 
     public void ResetCurrentCameraParam()

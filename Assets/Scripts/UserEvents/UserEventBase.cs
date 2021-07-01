@@ -12,7 +12,7 @@ public class UserEventBase : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        comm = GameObject.Find("Communication").GetComponent<Communication>();
+        comm = GameObject.Find("Manager").GetComponent<Communication>();
     }
     protected virtual void Start()
     {

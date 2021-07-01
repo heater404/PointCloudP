@@ -14,7 +14,7 @@ public class RecvFPS : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        comm = GameObject.Find("Communication").GetComponent<Communication>();
+        comm = GameObject.Find("Manager").GetComponent<Communication>();
         fpsText = GetComponent<Text>();
     }
 

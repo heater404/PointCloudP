@@ -7,10 +7,9 @@ using UnityEngine.UI;
 public class ToolTipManager : MonoBehaviour
 {
     public Button[] ClearBtns;
-    Transform parent;
+    public Transform parent;
     void Awake()
     {
-        parent = GameObject.Find("UICanvas").transform;
         foreach (var clearBtn in ClearBtns)
         {
             clearBtn?.onClick.AddListener(DestoryCurrentToolTip);
@@ -18,7 +17,7 @@ public class ToolTipManager : MonoBehaviour
     }
     public static ToolTipManager Instance()
     {
-        return GameObject.Find("ToolTipManager").GetComponent<ToolTipManager>();
+        return GameObject.Find("Manager").GetComponent<ToolTipManager>();
     }
 
     const int MaxToolTipsNumPerLayer = 2;

@@ -23,7 +23,7 @@ public class TwoDShaderHelperBase : MonoBehaviour
         if (!IsSupport())
             return;
 
-        comm = GameObject.Find("Communication").GetComponent<Communication>();
+        comm = GameObject.Find("Manager").GetComponent<Communication>();
         Slider.OnValueChanged.AddListener((min, max) =>
         {
             OnThresholdChanged(min, max);
