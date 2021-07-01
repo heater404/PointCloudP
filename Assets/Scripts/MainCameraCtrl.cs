@@ -6,14 +6,15 @@ using UnityEngine.UI;
 public class MainCameraCtrl : MonoBehaviour
 {
     public List<CameraParams> CamerasParams { get; set; } = new List<CameraParams>();
+    public Button MainViewBtn;
+    public Button TopViewBtn;
+    public Button SideViewBtn;
     public Button[] ResetBtns;
+    public Transform PointCloud;
     public RectTransform Left;
     public RectTransform Top;
     public RectTransform Right;
     public RectTransform Bottom;
-    float miniViewWidth;
-    float topMenuHeight;
-    float colorBarWidth;
     // Use this for initialization
     void Start()
     {
@@ -21,6 +22,30 @@ public class MainCameraCtrl : MonoBehaviour
         {
             reset.onClick.AddListener(ResetCurrentCameraParam);
         }
+
+        MainViewBtn.onClick.AddListener(() =>
+        {
+            var camera = GetCurrentMiniViewCamera();
+            Camera.main.transform.position = camera.transform.position;
+            Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+        });
+
+        TopViewBtn.onClick.AddListener(() =>
+        {
+            var camera = GetCurrentMiniViewCamera();
+            Camera.main.transform.position = camera.transform.position;
+            Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+            Camera.main.transform.RotateAround(PointCloud.parent.position, Vector3.right, 90);
+        });
+
+        SideViewBtn.onClick.AddListener(() =>
+        {
+            var camera = GetCurrentMiniViewCamera();
+            Camera.main.transform.position = camera.transform.position;
+            Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+            Camera.main.transform.RotateAround(PointCloud.parent.position, Vector3.up, 90);
+
+        });
     }
 
     // Update is called once per frame
@@ -36,15 +61,29 @@ public class MainCameraCtrl : MonoBehaviour
 
     public void ResetCurrentCameraParam()
     {
-        foreach (var camera in Camera.allCameras)
+        var camera = GetCurrentMiniViewCamera();
+        Camera.main.transform.position = camera.transform.position;
+        Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+        Camera.main.orthographicSize = camera.orthographicSize;
+
+    }
+
+    Camera GetCurrentMiniViewCamera()
+    {
+        var count = Camera.allCamerasCount;
+        for (int i = 0; i < count; i++)
         {
-            if (camera.cullingMask == Camera.main.cullingMask)
+            if (i != 0)//非MainCamera
             {
-                Camera.main.transform.position = camera.transform.position;
-                Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
-                Camera.main.orthographicSize = camera.orthographicSize;
+                var camera = Camera.allCameras[i];
+                if (camera.cullingMask == Camera.main.cullingMask)
+                {
+                    return camera;
+                }
             }
         }
+
+        return null;
     }
 
     public void SetCameraParam(string targetLayer)
@@ -52,6 +91,7 @@ public class MainCameraCtrl : MonoBehaviour
         SaveCurrentCameraParam();
 
         var camera = CamerasParams.Find(param => param.Layer == LayerMask.NameToLayer(targetLayer));
+
         Camera.main.transform.position = camera.Position;
         Camera.main.transform.eulerAngles = camera.EulerAngles;
         Camera.main.orthographicSize = camera.Size;

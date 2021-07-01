@@ -7,18 +7,18 @@ using UnityEngine.UI.Extensions;
 public class TwoDShaderHelperBase : MonoBehaviour
 {
     public ComputeShader Shader; //GPU计算Shader
-    int kernel;//m_CShader中指定的一个计算函数入口编号
-    RenderTexture texture;//相位图渲染使用的纹理，该纹理各点的颜色由该点的相位值决定
-    ComputeBuffer buffer;//输入的各点当前到球心的距离值，球心就是摄像机的位置，摄像机采集的各点的相位值即可转化为距离值，即深度信息
+    protected int kernel;//m_CShader中指定的一个计算函数入口编号
+    public RenderTexture texture { get; private set; }//相位图渲染使用的纹理，该纹理各点的颜色由该点的相位值决定
+    public ComputeBuffer buffer;//输入的各点当前到球心的距离值，球心就是摄像机的位置，摄像机采集的各点的相位值即可转化为距离值，即深度信息
     protected Communication comm;
 
-    float min;
-    float max;
-    bool firstFrame = true;
+    protected float min;
+    protected float max;
+    protected bool firstFrame = true;
     public RangeSlider Slider;
     public Toggle AutoRangeToggle;
     public string KernelName;
-    void Awake()
+    protected virtual void Awake()
     {
         if (!IsSupport())
             return;
@@ -43,7 +43,7 @@ public class TwoDShaderHelperBase : MonoBehaviour
         mr.material.mainTexture = texture;
     }
     // Start is called before the first frame update
-    void Start()
+   protected virtual void Start()
     {
         //给m_CShader设置相应的数据
         Shader.SetFloat("width", comm.PixelWidth);
@@ -110,7 +110,6 @@ public class TwoDShaderHelperBase : MonoBehaviour
 
         return array[sn];
     }
-
 
     public static bool IsSupport()
     {

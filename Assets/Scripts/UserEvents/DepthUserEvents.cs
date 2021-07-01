@@ -5,14 +5,4 @@ public class DepthUserEvents : UserEventBase
     {
         return $"{sn}:\n{value}mm";
     }
-
-    protected override void Start()
-    {
-        base.Start();
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
 }

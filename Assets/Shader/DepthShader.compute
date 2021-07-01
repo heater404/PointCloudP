@@ -14,6 +14,10 @@ RWStructuredBuffer<float> buffer;//输入的当前最新的点云各点的半径
 
 RWTexture2D<float4> renderTexture;//相位图纹理
 
+RWStructuredBuffer<float3> coe;//点云半径映射到三维空间的系数
+RWStructuredBuffer<float3> points;//计算输出的点云三维空间坐标值
+RWStructuredBuffer<float4> colors;//计算输出的点云各定点颜色值
+
 //色调H：用角度度量，取值范围为0°～360°，从红色开始按逆时针方向计算，红色为0°，绿色为120°,蓝色为240° 黄色为60°，青色为180°,品红为300°。
 //饱和度S：表示颜色接近光谱色的程度。一种颜色，可以看成是某种光谱色与白色混合的结果。其中光谱色所占的比例愈大，颜色接近光谱色的程度就愈高，颜色的饱和度也就愈高。
 //饱和度高，颜色则深而艳。光谱色的白光成分为0，饱和度达到最高。通常取值范围为0%～100%，值越大，颜色越饱和
@@ -64,4 +68,9 @@ void DepthKernel(uint3 id : SV_DispatchThreadID)
 	//颜色变换输入值必须为0~1，所以输入前需先进行归一化操作
 	float normal = Normalize(buffer[i], max, min);
 	renderTexture[id.xy] = HSVToRGB(normal * 280, 1, 1);
+
+	colors[i] = renderTexture[id.xy];
+	points[i].z = buffer[i];//XYZ格式
+	points[i].x = coe[i].x * points[i].z;
+	points[i].y = coe[i].y * points[i].z;
 }

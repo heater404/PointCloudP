@@ -6,8 +6,8 @@ using UnityEngine.EventSystems;
 public class UserEventBase : MonoBehaviour
 {
     protected Communication comm;
-    float scaleSpeed = 0.2f;
-    float moveSpeed = 0.003f;
+    protected float scaleSpeed = 0.2f;
+    protected float moveSpeed = 0.003f;
     protected TwoDShaderHelperBase helper;
     // Start is called before the first frame update
     void Awake()
@@ -29,21 +29,13 @@ public class UserEventBase : MonoBehaviour
 
     }
 
-    protected virtual void OnDestroy()
-    {
-
-    }
 
     private void OnMouseOver()
     {
         //鼠标滑轮进行缩放
         if (Input.mouseScrollDelta != Vector2.zero)
         {
-            Vector2 scroll = Input.mouseScrollDelta;
-            if (scroll.y > 0)
-                Camera.main.orthographicSize -= scaleSpeed;
-            else
-                Camera.main.orthographicSize += scaleSpeed;
+            MouseScroll(Input.mouseScrollDelta);
         }
 
         if (Input.GetMouseButtonDown(1))
@@ -55,13 +47,28 @@ public class UserEventBase : MonoBehaviour
         if (Input.GetMouseButton(1))
         {
             Vector3 currentPoint = Input.mousePosition;
-
-            Camera.main.transform.Translate(-(currentPoint.x - lastPoint.x) * moveSpeed, 0, 0);
-            Camera.main.transform.Translate(0, -(currentPoint.y - lastPoint.y) * moveSpeed, 0);
+            GetRightMouseButtonDown(currentPoint - lastPoint);
             lastPoint = Input.mousePosition;
         }
     }
 
+    protected virtual void MouseScroll(Vector2 scrollDelta)
+    {
+        if (scrollDelta.y > 0)
+        {
+            Camera.main.orthographicSize -= scaleSpeed;
+            if (Camera.main.orthographicSize < 0)
+                Camera.main.orthographicSize += scaleSpeed;
+        }
+        else
+            Camera.main.orthographicSize += scaleSpeed;
+    }
+
+    protected virtual void GetRightMouseButtonDown(Vector3 pointDelta)
+    {
+        Camera.main.transform.Translate(-(pointDelta.x) * moveSpeed, 0, 0);
+        Camera.main.transform.Translate(0, -(pointDelta.y) * moveSpeed, 0);
+    }
 
     //左键点击碰撞体
     void OnMouseDown()
@@ -73,21 +80,26 @@ public class UserEventBase : MonoBehaviour
             //将世界坐标转换为本地坐标,本地坐标的坐标原点是Quad的中心点 
             //但是像素坐标是以左上角为坐标中心的，所以还需要将本地坐标添加一个偏移
             Vector3 localPoint = this.gameObject.transform.InverseTransformPoint(rayhit.point);
-
-            var newPoint = localPoint + new Vector3(0.5f, -0.5f, 0);
-            newPoint = new Vector3(newPoint.x, -newPoint.y, newPoint.z);
-
-            //再将本地坐标转换为像素坐标
-            //(1.0 / comm.PixelColumn)表示一个像素占的大小
-            Vector2Int sn = new Vector2Int((int)(newPoint.x / (1.0 / comm.PixelWidth)), (int)(newPoint.y / (1.0 / comm.PixelHeight)));
-            ToolTipManager.Instance().Show(() =>
-            {
-                var data = helper.GetBufferData(sn);
-
-                return ToolTipFormat(sn, data);
-            }, localPoint, this.gameObject);
+            OnLeftMouseButtonDown(localPoint);
         }
     }
+
+    protected virtual void OnLeftMouseButtonDown(Vector3 localPoint)
+    {
+        var newPoint = localPoint + new Vector3(0.5f, -0.5f, 0);
+        newPoint = new Vector3(newPoint.x, -newPoint.y, newPoint.z);
+
+        //再将本地坐标转换为像素坐标
+        //(1.0 / comm.PixelColumn)表示一个像素占的大小
+        Vector2Int sn = new Vector2Int((int)(newPoint.x / (1.0 / comm.PixelWidth)), (int)(newPoint.y / (1.0 / comm.PixelHeight)));
+        ToolTipManager.Instance().Show(() =>
+        {
+            var data = helper.GetBufferData(sn);
+
+            return ToolTipFormat(sn, data);
+        }, localPoint, this.gameObject);
+    }
+
 
     protected virtual string ToolTipFormat(Vector2Int sn, float value)
     {

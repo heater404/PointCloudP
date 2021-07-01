@@ -8,14 +8,4 @@ public class GrayUserEvents : UserEventBase
     {
         return $"{sn}:\n{value}LSB";
     }
-
-    protected override void Start()
-    {
-        base.Start();
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
 }
