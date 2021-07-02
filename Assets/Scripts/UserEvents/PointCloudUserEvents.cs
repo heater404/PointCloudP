@@ -20,12 +20,14 @@ public class PointCloudUserEvents : UserEventBase
 
     protected override void OnLeftMouseButtonDown(Vector3 localPoint)
     {
-       
+
     }
 
     protected override void GetRightMouseButtonDown(Vector3 pointDelta)
     {
-        Camera.main.transform.RotateAround(center.transform.position,Vector3.right, -pointDelta.y * moveSpeed);
-        Camera.main.transform.RotateAround(center.transform.position, Vector3.up, pointDelta.x * moveSpeed);
+        if (Mathf.Abs(pointDelta.x) > Mathf.Abs(pointDelta.y))
+            Camera.main.transform.RotateAround(center.transform.position, Vector3.up, pointDelta.x * moveSpeed);
+        else
+            Camera.main.transform.RotateAround(center.transform.position, Vector3.right, -pointDelta.y * moveSpeed);
     }
 }
