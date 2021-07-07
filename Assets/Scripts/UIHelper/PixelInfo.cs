@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ToolTip : MonoBehaviour
+public class PixelInfo : MonoBehaviour
 {
     private GameObject target;
     private Vector3 localPosition;

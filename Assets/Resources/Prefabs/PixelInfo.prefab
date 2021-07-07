@@ -36,7 +36,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 224631419204826096}
-  - component: {fileID: 114573207271633778}
+  - component: {fileID: 114960920044170444}
   m_Layer: 5
   m_Name: PixelInfo
   m_TagString: Untagged
@@ -131,17 +131,6 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
---- !u!114 &114573207271633778
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1191279671877846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9a1738e28bf4554999ac37244030251, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114876945792635964
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -179,6 +168,17 @@ MonoBehaviour:
     9999mm
 
     9999LSB'
+--- !u!114 &114960920044170444
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1191279671877846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1976305ef417d0d449e1a01ff7ff1d69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &222101528588208674
 CanvasRenderer:
   m_ObjectHideFlags: 1

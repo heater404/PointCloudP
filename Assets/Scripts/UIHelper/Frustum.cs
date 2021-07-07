@@ -41,7 +41,7 @@ public class Frustum : MonoBehaviour
             z4 * pointCloud.TransCoe[comm.PixelWidth * (comm.PixelHeight - 1)].y, z4);
 
         //计算视景体中心点坐标
-        var center = (p1 + p3) / 2 / 1 / 3;
+        var center = (p1 + p3) / 2 / 2;
 
         //计算BoxCollider的Size，
         //不用MeshCollider的原因是因为我们自定义的Mesh的类型是Point或者LineStrip,

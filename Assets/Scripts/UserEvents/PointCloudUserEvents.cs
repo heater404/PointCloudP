@@ -23,6 +23,21 @@ public class PointCloudUserEvents : UserEventBase
         //Debug.Log($"OnLeftMouseButtonDown:{localPoint}");
     }
 
+    protected override void MouseScroll(Vector2 scrollDelta)
+    {
+        base.MouseScroll(scrollDelta);
+    }
+
+    protected override void OnLeftMouseButtonHoldDown(Vector3 start, Vector3 end)
+    {
+        //base.OnLeftMouseButtonHoldDown(start, end);
+    }
+
+    protected override void OnMouseExit()
+    {
+        //base.OnMouseExit();
+    }
+
     protected override void OnRightMouseButtonHoldDown(Vector3 pointDelta)
     {
         if (Mathf.Abs(pointDelta.x) > Mathf.Abs(pointDelta.y))

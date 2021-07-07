@@ -31,7 +31,7 @@ public class ToolTipManager : MonoBehaviour
     {
         var tooltip = (GameObject)Instantiate(Resources.Load("Prefabs/PixelInfo", typeof(GameObject)), Vector3.zero, Quaternion.Euler(0, 0, 0), ToolTipsParent);
         tooltip.transform.SetSiblingIndex(0);//设置子物体的index
-        tooltip.GetComponent<ToolTip>().Show(updateToolTip, position, target);
+        tooltip.GetComponent<PixelInfo>().Show(updateToolTip, position, target);
         tooltip.layer = (int)Mathf.Log(Camera.main.cullingMask, 2);
         pixelInfos.Add(tooltip);
 
