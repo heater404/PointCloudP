@@ -5,7 +5,6 @@ using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.UI;
-using ExtraFoundation.Components;
 
 public class DepthShaderHelper : ShaderHelperBase
 {
@@ -27,7 +26,7 @@ public class DepthShaderHelper : ShaderHelperBase
         Shader.SetBuffer(kernel, "coe", coefficient);
         Shader.SetBuffer(kernel, "points", pointsBuffer);
         Shader.SetBuffer(kernel, "colors", colorBuffer);
-        Shader.SetFloat("hMax", ColorBar.HMax);
+        Shader.SetFloat("hMax", DepthColorBar.HMax);
         coefficient.SetData(pointCloud.TransCoe);
 
         pointCloud.matVertex.SetBuffer("points", pointsBuffer);

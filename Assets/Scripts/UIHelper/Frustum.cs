@@ -1,4 +1,3 @@
-using ExtraFoundation.Components;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
