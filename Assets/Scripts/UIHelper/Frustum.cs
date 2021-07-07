@@ -1,3 +1,4 @@
+using ExtraFoundation.Components;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ public class Frustum : MonoBehaviour
     Vector3 p2;
     Vector3 p3;
     Vector3 p4;
-    const float MaxDepth = 6500.0f;
+    const float MaxDepth = 6500f;
     private void Awake()
     {
         comm = GameObject.Find("Manager").GetComponent<Communication>();
@@ -24,7 +25,7 @@ public class Frustum : MonoBehaviour
     {
         p0 = Vector3.zero;
 
-        //计算像素矩阵的四个角的坐标，默认最大深度值为65000mm
+        //计算像素矩阵的四个角的坐标，默认最大深度值为6500mm
         var z1 = MaxDepth / pointCloud.TransCoe[0].z;
         p1 = new Vector3(z1 * pointCloud.TransCoe[0].x, z1 * pointCloud.TransCoe[0].y, z1);
 
@@ -40,7 +41,7 @@ public class Frustum : MonoBehaviour
             z4 * pointCloud.TransCoe[comm.PixelWidth * (comm.PixelHeight - 1)].y, z4);
 
         //计算视景体中心点坐标
-        var center = (p1 + p3) / 2 / 2;
+        var center = (p1 + p3) / 2 / 1 / 3;
 
         //计算BoxCollider的Size，
         //不用MeshCollider的原因是因为我们自定义的Mesh的类型是Point或者LineStrip,

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 
-public class GrayShaderHelper : TwoDShaderHelperBase
+public class GrayShaderHelper : ShaderHelperBase
 {
     protected override IEnumerator MonitorUpdate()
     {

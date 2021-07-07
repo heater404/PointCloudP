@@ -9,6 +9,7 @@ float width;//列数
 float height;//行数
 float max;//点云的最大半径
 float min;//点云的最小半径
+float hMax;//HSV中h的最大值
 
 RWStructuredBuffer<float> buffer;//输入的当前最新的点云各点的半径值
 
@@ -51,10 +52,10 @@ float Normalize(float v, float max, float min) {
 	//	v = min + 0.0001;
 	//return log10(1 + 10 * (v - min) / (max - min)) * 0.96;//非线性映射
 	//return pow((v-min)/(max-min), 0.2);
-	if (v < min)
+	/*if (v < min)
 		return 0;
 	if (v > max)
-		return 1;
+		return 1;*/
 
 	return ((v - min) / (max - min));
 }
@@ -67,7 +68,7 @@ void DepthKernel(uint3 id : SV_DispatchThreadID)
 	uint i = id.x + (height - id.y - 1) * width; //纹理坐标的原点在左下角。故Y轴要取反
 	//颜色变换输入值必须为0~1，所以输入前需先进行归一化操作
 	float normal = Normalize(buffer[i], max, min);
-	renderTexture[id.xy] = HSVToRGB(normal * 280, 1, 1);
+	renderTexture[id.xy] = HSVToRGB(normal * 360* hMax, 1, 1);
 
 	colors[i] = renderTexture[id.xy];
 	points[i].z = buffer[i];//XYZ格式

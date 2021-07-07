@@ -5,8 +5,9 @@ using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.UI;
+using ExtraFoundation.Components;
 
-public class DepthShaderHelper : TwoDShaderHelperBase
+public class DepthShaderHelper : ShaderHelperBase
 {
     ComputeBuffer coefficient;//在给定三维球体的半径情况下，二维照片映射到三维球面的变换系数表
     ComputeBuffer pointsBuffer;//映射后的二维照片各点的三维坐标值，坐标系为直角坐标系
@@ -26,6 +27,7 @@ public class DepthShaderHelper : TwoDShaderHelperBase
         Shader.SetBuffer(kernel, "coe", coefficient);
         Shader.SetBuffer(kernel, "points", pointsBuffer);
         Shader.SetBuffer(kernel, "colors", colorBuffer);
+        Shader.SetFloat("hMax", ColorBar.HMax);
         coefficient.SetData(pointCloud.TransCoe);
 
         pointCloud.matVertex.SetBuffer("points", pointsBuffer);
@@ -47,5 +49,23 @@ public class DepthShaderHelper : TwoDShaderHelperBase
                 yield return null;
             }
         }
+    }
+
+    public override Vector3 GetPointData(Vector2Int position)
+    {
+        Vector3[] array = new Vector3[comm.PixelWidth * comm.PixelHeight];
+        pointsBuffer.GetData(array);
+
+        var sn = comm.PixelWidth * position.y + position.x;
+
+        return array[sn];
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        coefficient.Release();
+        pointsBuffer.Release();
+        colorBuffer.Release();
     }
 }

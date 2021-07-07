@@ -1,10 +1,12 @@
+using ExtraFoundation.Components;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 
-public class TwoDShaderHelperBase : MonoBehaviour
+public class ShaderHelperBase : MonoBehaviour
 {
     public ComputeShader Shader; //GPU计算Shader
     protected int kernel;//m_CShader中指定的一个计算函数入口编号
@@ -43,7 +45,7 @@ public class TwoDShaderHelperBase : MonoBehaviour
         mr.material.mainTexture = texture;
     }
     // Start is called before the first frame update
-   protected virtual void Start()
+    protected virtual void Start()
     {
         //给m_CShader设置相应的数据
         Shader.SetFloat("width", comm.PixelWidth);
@@ -76,6 +78,15 @@ public class TwoDShaderHelperBase : MonoBehaviour
             Slider.HighValue = max;
             firstFrame = false;
         }
+
+        Parallel.For(0, data.Length, i =>
+          {
+              if (data[i] > max)
+                  data[i] = max;
+              else if (data[i] < min)
+                  data[i] = min;
+          });
+
         //每次更新当前所有点的深度值，即该点到球心的值
         buffer.SetData(data);
 
@@ -111,12 +122,16 @@ public class TwoDShaderHelperBase : MonoBehaviour
         return array[sn];
     }
 
+    public virtual Vector3 GetPointData(Vector2Int position)
+    {
+        return Vector3.zero;
+    }
     public static bool IsSupport()
     {
         return SystemInfo.supportsComputeShaders;
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         buffer.Release();
         texture.Release();
