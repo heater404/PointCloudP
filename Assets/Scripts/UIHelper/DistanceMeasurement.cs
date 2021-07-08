@@ -15,6 +15,11 @@ public class DistanceMeasurement : BaseMeshEffect
     float width = 2;
     Color color = Color.white;
 
+    void  Start()
+    {
+        
+    }
+
     public override void ModifyMesh(VertexHelper vh)
     {
         vh.Clear();
@@ -23,20 +28,21 @@ public class DistanceMeasurement : BaseMeshEffect
         var start = LocalPositionToScreenPoint(LocalStartPoint);
         var end = LocalPositionToScreenPoint(LocalEndPoint);
 
+        var offset = this.gameObject.transform.position;
         var sita = Mathf.Atan((end.y - start.y) / (start.x - end.x));
-        verts[0].position = new Vector3(start.x - width / 2 * Mathf.Sin(sita), start.y - width / 2 * Mathf.Cos(sita));
+        verts[0].position = new Vector3(start.x - width / 2 * Mathf.Sin(sita), start.y - width / 2 * Mathf.Cos(sita))-offset;
         verts[0].color = color;
         verts[0].uv0 = Vector2.zero;
 
-        verts[1].position = new Vector3(start.x + width / 2 * Mathf.Sin(sita), start.y + width / 2 * Mathf.Cos(sita));
+        verts[1].position = new Vector3(start.x + width / 2 * Mathf.Sin(sita), start.y + width / 2 * Mathf.Cos(sita)) - offset;
         verts[1].color = color;
         verts[1].uv0 = Vector2.zero;
 
-        verts[2].position = new Vector3(end.x + width / 2 * Mathf.Sin(sita), end.y + width / 2 * Mathf.Cos(sita));
+        verts[2].position = new Vector3(end.x + width / 2 * Mathf.Sin(sita), end.y + width / 2 * Mathf.Cos(sita)) - offset;
         verts[2].color = color;
         verts[2].uv0 = Vector2.zero;
 
-        verts[3].position = new Vector3(end.x - width / 2 * Mathf.Sin(sita), end.y - width / 2 * Mathf.Cos(sita));
+        verts[3].position = new Vector3(end.x - width / 2 * Mathf.Sin(sita), end.y - width / 2 * Mathf.Cos(sita)) - offset;
         verts[3].color = color;
         verts[3].uv0 = Vector2.zero;
 
@@ -50,11 +56,6 @@ public class DistanceMeasurement : BaseMeshEffect
         this.target = target;
     }
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
     private Vector3 LocalPositionToScreenPoint(Vector3 localPosition)
     {
         var worldPosition = target.transform.TransformPoint(localPosition);
@@ -64,15 +65,16 @@ public class DistanceMeasurement : BaseMeshEffect
     // Update is called once per frame
     void Update()
     {
-        this.GetComponent<Image>().SetVerticesDirty();//强制刷新顶点
-
         var start = LocalPositionToScreenPoint(LocalStartPoint);
         var end = LocalPositionToScreenPoint(LocalEndPoint);
         var v = start - end;
-        Child.transform.localPosition = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2, 0);
+        this.gameObject.transform.position = start;
+        Child.transform.localPosition = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2, 0)- this.gameObject.transform.position;
         Child.transform.eulerAngles = new Vector3(0, 0, 180 * Mathf.Atan(v.y / v.x) / Mathf.PI);
         if (GetDistance == null)
             return;
         Child.transform.GetChild(0).GetComponent<Text>().text = $"{Mathf.RoundToInt(GetDistance.Invoke())}mm";
+
+        this.GetComponent<Image>().SetVerticesDirty();//强制刷新顶点
     }
 }

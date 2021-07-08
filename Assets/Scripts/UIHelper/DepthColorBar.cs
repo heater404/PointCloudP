@@ -7,11 +7,6 @@ public class DepthColorBar : ColorBarBase
 {
     public const float HMax = 0.8f;
 
-    protected override void Update()
-    {
-        base.Update();
-    }
-
     protected override void Start()
     {
         base.Start();
@@ -22,6 +17,10 @@ public class DepthColorBar : ColorBarBase
         base.ModifyMesh(vh);
     }
 
+    protected override void Update()
+    {
+        base.Update();
+    }
 
     protected override string MarkFormat(float value)
     {

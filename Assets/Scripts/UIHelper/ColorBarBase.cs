@@ -1,31 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 
 public abstract class ColorBarBase : BaseMeshEffect
 {
-    public RangeSlider DepthRange;
+    public RangeSlider Range;
     protected int VertexCount = 100;
     float fBottomY, fTopY, fLeftX, fRightX;
     int regionCount = 8;
     float[] markes = new float[] { 1, 2, 5 };
     List<GameObject> scaleMarks = new List<GameObject>();
-    protected virtual void Start()
+    protected new virtual void Start()
     {
         //初始化的时候新建 并且始终未这个数
         for (int i = 0; i < 10; i++)
         {
             var scaleMark = (GameObject)Instantiate(Resources.Load("Prefabs/ScaleMark", typeof(GameObject)));
             scaleMark.transform.parent = this.transform;
+            scaleMark.layer = this.gameObject.layer;
             scaleMarks.Add(scaleMark);
         }
     }
 
     protected virtual void Update()
     {
-        float range = DepthRange.HighValue - DepthRange.LowValue;
+        UpdateScaleMark(this.Range.LowValue, this.Range.HighValue);
+    }
+
+    protected void UpdateScaleMark(float low, float high)
+    {
+        float range = high - low;
 
         var step = range / regionCount;
         int power = 0;
@@ -37,8 +44,8 @@ public abstract class ColorBarBase : BaseMeshEffect
 
         step = NearestToTarget(markes, step) * Mathf.Pow(10, power);
 
-        var min = Mathf.Ceil(DepthRange.LowValue / step) * step;
-        var max = Mathf.Floor(DepthRange.HighValue / step) * step;
+        var min = Mathf.Ceil(low / step) * step;
+        var max = Mathf.Floor(high / step) * step;
 
         int count = (int)((max - min) / step + 1);
         if (scaleMarks.Count > count)
@@ -55,14 +62,15 @@ public abstract class ColorBarBase : BaseMeshEffect
             {
                 var scaleMark = (GameObject)Instantiate(Resources.Load("Prefabs/ScaleMark", typeof(GameObject)));
                 scaleMark.transform.parent = this.transform;
+                scaleMark.layer = this.gameObject.layer;
                 scaleMarks.Add(scaleMark);
             }
         }
 
-        var scale = (fTopY - fBottomY) / (DepthRange.HighValue - DepthRange.LowValue);
+        var scale = (fTopY - fBottomY) / range;
         for (int i = 0; i < scaleMarks.Count; i++)
         {
-            var y = fTopY - scale * (step * i + min - DepthRange.LowValue);
+            var y = fTopY - scale * (step * i + min - low);
             scaleMarks[i].transform.localPosition = new Vector3(0, y);
             scaleMarks[i].GetComponent<Text>().text = MarkFormat(min + step * i);
             scaleMarks[i].GetComponent<Text>().color = MarkColor();
@@ -138,6 +146,5 @@ public abstract class ColorBarBase : BaseMeshEffect
 
     protected abstract string MarkFormat(float value);
     protected abstract Color GetColor(float i);
-
     protected abstract Color MarkColor();
 }

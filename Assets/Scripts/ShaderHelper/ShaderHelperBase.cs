@@ -15,7 +15,7 @@ public class ShaderHelperBase : MonoBehaviour
 
     protected float min;
     protected float max;
-    protected bool firstFrame = true;
+    protected int frameCount = 0;
     public RangeSlider Slider;
     public Toggle AutoRangeToggle;
     public string KernelName;
@@ -69,13 +69,13 @@ public class ShaderHelperBase : MonoBehaviour
 
     protected void Dispatch(float[] data)
     {
-        if (firstFrame || AutoRangeToggle.isOn)
+        if (frameCount < 3 || AutoRangeToggle.isOn)
         {
             min = Mathf.Min(data);
             max = Mathf.Max(data);
             Slider.LowValue = min;
             Slider.HighValue = max;
-            firstFrame = false;
+            frameCount++;
         }
 
         Parallel.For(0, data.Length, i =>

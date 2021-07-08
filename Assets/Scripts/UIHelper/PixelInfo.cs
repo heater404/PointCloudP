@@ -28,7 +28,7 @@ public class PixelInfo : MonoBehaviour
             return;
 
         this.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = updateToolTip?.Invoke();
-        this.gameObject.transform.transform.position = LocalPositionToScreenPoint(localPosition);
+        this.gameObject.transform.position = LocalPositionToScreenPoint(localPosition);
     }
 
     /// <summary>
