@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class UserEventBase : MonoBehaviour
 {
     protected Communication comm;
-    protected float scaleSpeed = 0.2f;
+    protected float scaleSpeed = 0.19f;//±ÜÃâ³öÏÖÁã
     protected float moveSpeed = 0.003f;
     protected ShaderHelperBase helper;
     // Start is called before the first frame update
@@ -132,9 +132,10 @@ public class UserEventBase : MonoBehaviour
                 var pixelSNStart = LocalPointToPixelSN(localPointStart);
                 var pixelSNEnd = LocalPointToPixelSN(localPointEnd);
 
-                ToolTipManager.Instance().ShowDistanceInfo(()=>
+                ToolTipManager.Instance().ShowDistanceInfo(() =>
                 {
-                    return Vector3.Distance(helper.GetPointData(pixelSNEnd), helper.GetPointData(pixelSNStart));
+                    var dist = Vector3.Distance(helper.GetPointData(pixelSNEnd), helper.GetPointData(pixelSNStart));
+                    return dist;
                 }, localPointStart, localPointEnd, this.gameObject);
             }
         }
@@ -142,7 +143,7 @@ public class UserEventBase : MonoBehaviour
 
     protected virtual void OnMouseExit()
     {
-        
+
     }
 
     //×ó¼üµã»÷Åö×²Ìå

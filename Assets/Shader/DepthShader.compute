@@ -10,11 +10,13 @@ float height;//行数
 float max;//点云的最大半径
 float min;//点云的最小半径
 float hMax;//HSV中h的最大值
+float confidenceT;//置信度阈值
 
 RWStructuredBuffer<float> buffer;//输入的当前最新的点云各点的半径值
 
 RWTexture2D<float4> renderTexture;//相位图纹理
 
+RWStructuredBuffer<float> confidence;//置信度
 RWStructuredBuffer<float3> coe;//点云半径映射到三维空间的系数
 RWStructuredBuffer<float3> points;//计算输出的点云三维空间坐标值
 RWStructuredBuffer<float4> colors;//计算输出的点云各定点颜色值
@@ -71,7 +73,11 @@ void DepthKernel(uint3 id : SV_DispatchThreadID)
 	renderTexture[id.xy] = HSVToRGB(normal * 360* hMax, 1, 1);
 
 	colors[i] = renderTexture[id.xy];
+		
 	points[i].z = buffer[i];//XYZ格式
 	points[i].x = coe[i].x * points[i].z;
 	points[i].y = coe[i].y * points[i].z;
+
+	if (confidence[i] < confidenceT)
+		points[i] = float3(0, 0, 0);
 }

@@ -15,11 +15,6 @@ public class DistanceMeasurement : BaseMeshEffect
     float width = 2;
     Color color = Color.white;
 
-    void  Start()
-    {
-        
-    }
-
     public override void ModifyMesh(VertexHelper vh)
     {
         vh.Clear();
