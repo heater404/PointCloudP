@@ -24,7 +24,7 @@ public class DepthColorBar : ColorBarBase
 
     protected override string MarkFormat(float value)
     {
-        return $"-{value}mm";
+        return $"{value}-";
     }
 
     protected override Color GetColor(float i)
@@ -36,6 +36,6 @@ public class DepthColorBar : ColorBarBase
 
     protected override Color MarkColor()
     {
-        return new Color(48/255f,48/255f,48/255f,1);
+        return Color.white;
     }
 }

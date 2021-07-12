@@ -15,7 +15,7 @@ public class GrayColorBar : ColorBarBase
 
     protected override string MarkFormat(float value)
     {
-        return $"-{value}LSB";
+        return $"{value}-";
     }
 
     public override void ModifyMesh(VertexHelper vh)
@@ -37,7 +37,6 @@ public class GrayColorBar : ColorBarBase
 
     protected override Color MarkColor()
     {
-        //return new Color(68 / 255f, 68 / 255f, 68 / 255f, 1);
-        return Color.grey;
+        return Color.white;
     }
 }

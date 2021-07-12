@@ -13,6 +13,7 @@ public abstract class ColorBarBase : BaseMeshEffect
     int regionCount = 8;
     float[] markes = new float[] { 1, 2, 5 };
     List<GameObject> scaleMarks = new List<GameObject>();
+    float xPos;
     protected new virtual void Start()
     {
         //初始化的时候新建 并且始终未这个数
@@ -23,6 +24,9 @@ public abstract class ColorBarBase : BaseMeshEffect
             scaleMark.layer = this.gameObject.layer;
             scaleMarks.Add(scaleMark);
         }
+        var w1 = scaleMarks[0].transform.parent.GetComponent<RectTransform>().rect.width / 2;
+        var w2 = scaleMarks[0].transform.GetComponent<RectTransform>().rect.width / 2;
+        xPos = w1 + w2;
     }
 
     protected virtual void Update()
@@ -70,8 +74,8 @@ public abstract class ColorBarBase : BaseMeshEffect
         var scale = (fTopY - fBottomY) / range;
         for (int i = 0; i < scaleMarks.Count; i++)
         {
-            var y = fTopY - scale * (step * i + min - low);
-            scaleMarks[i].transform.localPosition = new Vector3(0, y);
+            var y = fBottomY + scale * (step * i + min - low);
+            scaleMarks[i].transform.localPosition = new Vector3(-xPos, y);
             scaleMarks[i].GetComponent<Text>().text = MarkFormat(min + step * i);
             scaleMarks[i].GetComponent<Text>().color = MarkColor();
         }
@@ -128,8 +132,8 @@ public abstract class ColorBarBase : BaseMeshEffect
             var color1 = GetColor(i + 1);
 
             UIVertex[] verts0 = new UIVertex[4];
-            var y0 = fTopY - i * posStep;
-            var y1 = y0 - posStep;
+            var y0 = fBottomY + i * posStep;
+            var y1 = y0 + posStep;
             verts0[0].position = new Vector3(fLeftX, y0);
             verts0[0].color = color0;
             verts0[1].position = new Vector3(fRightX, y0);
