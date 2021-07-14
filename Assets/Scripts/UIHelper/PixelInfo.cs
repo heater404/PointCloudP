@@ -86,8 +86,7 @@ public class PixelInfo : MonoBehaviour, IPointerClickHandler
         }
         else if (eventData.button == PointerEventData.InputButton.Right && Input.GetKey(KeyCode.LeftControl))
         {
-            if (PixelInfoStatus.Active == this.status)
-                manager.DestoryOnePixelInfo(this.gameObject);
+            manager.DestoryOnePixelInfo(this.gameObject);
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UserEventBase : MonoBehaviour
+public class UserEventBase : MonoBehaviour, IPointerClickHandler, IDragHandler, IDropHandler, IBeginDragHandler,IScrollHandler
 {
     protected Communication comm;
     protected float scaleSpeed = 0.19f;//避免出现零
@@ -22,8 +22,6 @@ public class UserEventBase : MonoBehaviour
         helper = this.gameObject.GetComponent<ShaderHelperBase>();
     }
 
-    // Update is called once per frame
-    Vector3? rightMouseButtonLastPoint = null;
     Vector3? leftMouseButtonDownLastPoint = null;
     // Update is called once per frame
     void Update()
@@ -33,32 +31,11 @@ public class UserEventBase : MonoBehaviour
 
     private void OnMouseOver()
     {
-        //鼠标滑轮进行缩放
-        if (Input.mouseScrollDelta != Vector2.zero)
-        {
-            MouseScroll(Input.mouseScrollDelta);
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            rightMouseButtonLastPoint = Input.mousePosition;
-        }
-
         if (Input.GetMouseButtonDown(0))
         {
             leftMouseButtonDownLastPoint = Input.mousePosition;
         }
 
-        //按住鼠标右键进行平移
-        if (Input.GetMouseButton(1))
-        {
-            if (rightMouseButtonLastPoint == null)
-                return;
-
-            Vector3 currentPoint = Input.mousePosition;
-            OnRightMouseButtonHoldDown(currentPoint - rightMouseButtonLastPoint.Value);
-            rightMouseButtonLastPoint = Input.mousePosition;
-        }
 
         //按住鼠标左键画线
         if (Input.GetMouseButton(0))
@@ -88,16 +65,11 @@ public class UserEventBase : MonoBehaviour
             if (Mathf.Abs(delta.x) < 2 && Mathf.Abs(delta.y) < 2)
                 return;
 
-            OnMouseDown();
-        }
-
-        if (Input.GetMouseButtonUp(1))
-        {
-            rightMouseButtonLastPoint = null;
+            //OnMouseDown();
         }
     }
 
-    protected virtual void MouseScroll(Vector2 scrollDelta)
+    protected virtual void OnMouseScroll(Vector2 scrollDelta)
     {
         if (scrollDelta.y > 0)
         {
@@ -109,7 +81,7 @@ public class UserEventBase : MonoBehaviour
             Camera.main.orthographicSize += scaleSpeed;
     }
 
-    protected virtual void OnRightMouseButtonHoldDown(Vector3 pointDelta)
+    protected virtual void OnRightMouseButtonDrag(Vector3 pointDelta)
     {
         Camera.main.transform.Translate(-(pointDelta.x) * moveSpeed, 0, 0);
         Camera.main.transform.Translate(0, -(pointDelta.y) * moveSpeed, 0);
@@ -146,21 +118,7 @@ public class UserEventBase : MonoBehaviour
 
     }
 
-    //左键点击碰撞体
-    void OnMouseDown()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit rayhit;
-        if (Physics.Raycast(ray, out rayhit))
-        {
-            //将世界坐标转换为本地坐标,本地坐标的坐标原点是Quad的中心点 
-            //但是像素坐标是以左上角为坐标中心的，所以还需要将本地坐标添加一个偏移
-            Vector3 localPoint = this.gameObject.transform.InverseTransformPoint(rayhit.point);
-            OnLeftMouseButtonDown(localPoint);
-        }
-    }
-
-    protected virtual void OnLeftMouseButtonDown(Vector3 localPoint)
+    protected virtual void OnLeftMouseButtonClick(Vector3 localPoint)
     {
         Vector2Int sn = LocalPointToPixelSN(localPoint);
         ToolTipManager.Instance().ShowPixelInfo(() =>
@@ -185,5 +143,52 @@ public class UserEventBase : MonoBehaviour
     protected virtual string ToolTipFormat(Vector2Int sn, float value)
     {
         return "";
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            Vector3 localPoint = this.gameObject.transform.InverseTransformPoint(
+                eventData.pointerCurrentRaycast.worldPosition);
+            OnLeftMouseButtonClick(localPoint);
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (eventData.dragging && eventData.button == PointerEventData.InputButton.Right)
+        {
+            OnRightMouseButtonDrag(eventData.delta);
+        }
+        else if (eventData.dragging && eventData.button == PointerEventData.InputButton.Left)
+        {
+            Debug.Log("LeftOnDrag");
+
+
+        }
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        Debug.Log("OnDrop");
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        //这里是左键拖拽之前的按压点，也需要一个PixelInfo，并且是Fix类型的
+        //不用eventData的坐标是因为有DragThreshold，即使设置为false也会有一个阈值偏差
+        //拖拽完成后会有一个鼠标抬起的动作会触发OnPointerClick事件，所以OnEndDrag省略了
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            Vector3 localPoint = this.gameObject.transform.InverseTransformPoint(
+               eventData.pointerPressRaycast.worldPosition);
+            OnLeftMouseButtonClick(localPoint);
+        }
+    }
+
+    public void OnScroll(PointerEventData eventData)
+    {
+        OnMouseScroll(eventData.scrollDelta);
     }
 }

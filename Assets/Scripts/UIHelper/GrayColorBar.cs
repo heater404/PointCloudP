@@ -18,19 +18,6 @@ public class GrayColorBar : ColorBarBase
         return $"{value}-";
     }
 
-    public override void ModifyMesh(VertexHelper vh)
-    {
-        base.ModifyMesh(vh);
-    }
-
-
-    // Use this for initialization
-    protected override void Start()
-    {
-        base.Start();
-    }
-
-
     protected override Color MarkColor()
     {
         return Color.white;

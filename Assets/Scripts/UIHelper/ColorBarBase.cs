@@ -18,7 +18,7 @@ public abstract class ColorBarBase : BaseMeshEffect
     float markTextXPos;
     const string ColorMarkTextBaseName = "ColorMarkText";
     GameObject markTextPrefab;
-    protected new virtual void Start()
+    protected new void Start()
     {
         markTextPrefab = (GameObject)Resources.Load("Prefabs/ColorMarkText", typeof(GameObject));
 

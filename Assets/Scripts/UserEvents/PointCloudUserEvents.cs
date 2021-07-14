@@ -18,14 +18,14 @@ public class PointCloudUserEvents : UserEventBase
     }
 
 
-    protected override void OnLeftMouseButtonDown(Vector3 localPoint)
+    protected override void OnLeftMouseButtonClick(Vector3 localPoint)
     {
         //Debug.Log($"OnLeftMouseButtonDown:{localPoint}");
     }
 
-    protected override void MouseScroll(Vector2 scrollDelta)
+    protected override void OnMouseScroll(Vector2 scrollDelta)
     {
-        base.MouseScroll(scrollDelta);
+        base.OnMouseScroll(scrollDelta);
     }
 
     protected override void OnLeftMouseButtonHoldDown(Vector3 start, Vector3 end)
@@ -38,7 +38,7 @@ public class PointCloudUserEvents : UserEventBase
         //base.OnMouseExit();
     }
 
-    protected override void OnRightMouseButtonHoldDown(Vector3 pointDelta)
+    protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
     {
         if (Mathf.Abs(pointDelta.x) > Mathf.Abs(pointDelta.y))
             Camera.main.transform.RotateAround(center.transform.position, Vector3.up, pointDelta.x * moveSpeed);

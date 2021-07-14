@@ -14,19 +14,19 @@ public class GrayUserEvents : UserEventBase
 
     }
 
-    protected override void OnRightMouseButtonHoldDown(Vector3 pointDelta)
+    protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
     {
-        base.OnRightMouseButtonHoldDown(pointDelta);
+        base.OnRightMouseButtonDrag(pointDelta);
     }
 
-    protected override void OnLeftMouseButtonDown(Vector3 localPoint)
+    protected override void OnLeftMouseButtonClick(Vector3 localPoint)
     {
-        base.OnLeftMouseButtonDown(localPoint);
+        base.OnLeftMouseButtonClick(localPoint);
     }
 
-    protected override void MouseScroll(Vector2 scrollDelta)
+    protected override void OnMouseScroll(Vector2 scrollDelta)
     {
-        base.MouseScroll(scrollDelta);
+        base.OnMouseScroll(scrollDelta);
     }
 
 }
