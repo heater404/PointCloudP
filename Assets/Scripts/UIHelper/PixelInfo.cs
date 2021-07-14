@@ -2,17 +2,38 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class PixelInfo : MonoBehaviour
+public class PixelInfo : MonoBehaviour, IPointerClickHandler
 {
+    private PixelInfoStatus status;
+    public PixelInfoStatus Status
+    {
+        get { return status; }
+        set
+        {
+            if (PixelInfoStatus.Active == value)
+                dot.color = Color.white;
+            else if (PixelInfoStatus.Fix == value)
+                dot.color = new Color(0.18f, 0.18f, 0.18f, 1f);
+            status = value;
+        }
+    }
     private GameObject target;
     private Vector3 localPosition;
     private Func<string> updateToolTip;
+    ToolTipManager manager;
+    RawImage dot;
     private void Awake()
     {
-
+        manager = ToolTipManager.Instance();
+        dot = this.gameObject.transform.Find("Dot")?.gameObject.GetComponent<RawImage>();
+        if (null == dot)
+        {
+            Debug.Log("Can't find  PixelInfo's Dot");
+        }
     }
 
     // Start is called before the first frame update
@@ -52,5 +73,21 @@ public class PixelInfo : MonoBehaviour
         var worldPosition = target.transform.TransformPoint(localPosition);
 
         return Camera.main.WorldToScreenPoint(worldPosition);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right && !Input.GetKey(KeyCode.LeftControl))
+        {
+            if (this.status == PixelInfoStatus.Active)
+                this.Status = PixelInfoStatus.Fix;
+            else
+                this.Status = PixelInfoStatus.Active;
+        }
+        else if (eventData.button == PointerEventData.InputButton.Right && Input.GetKey(KeyCode.LeftControl))
+        {
+            if (PixelInfoStatus.Active == this.status)
+                manager.DestoryOnePixelInfo(this.gameObject);
+        }
     }
 }

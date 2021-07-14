@@ -105,7 +105,7 @@ public class SktClient
             {
                 if (null != client)
                 {
-                    int ret = client.EndSend(ar);
+                    client.EndSend(ar);
                 }
             }
             catch (Exception)

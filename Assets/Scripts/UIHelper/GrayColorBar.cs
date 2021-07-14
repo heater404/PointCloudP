@@ -30,10 +30,6 @@ public class GrayColorBar : ColorBarBase
         base.Start();
     }
 
-    protected override void Update()
-    {
-        base.Update();
-    }
 
     protected override Color MarkColor()
     {

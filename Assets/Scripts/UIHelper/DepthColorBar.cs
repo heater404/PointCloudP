@@ -17,11 +17,6 @@ public class DepthColorBar : ColorBarBase
         base.ModifyMesh(vh);
     }
 
-    protected override void Update()
-    {
-        base.Update();
-    }
-
     protected override string MarkFormat(float value)
     {
         return $"{value}-";
