@@ -37,13 +37,14 @@ public class ToolTipManager : MonoBehaviour
         return GameObject.Find("Manager").GetComponent<ToolTipManager>();
     }
 
-    const int MaxToolTipsNumPerLayer = 5;
+    const int MaxToolTipsNumPerLayer = 3;
     List<GameObject> pixelInfos = new List<GameObject>();
     List<GameObject> distancesInfos = new List<GameObject>();
-    public void ShowPixelInfo(Func<string> updateToolTip, Vector3 position, GameObject target)
+    public void ShowPixelInfo(Func<Vector2Int, float> pixelValue, string unit, Vector3 position, GameObject target, PixelInfoStatus status = PixelInfoStatus.Active)
     {
-        GameObject tooltip = CreatOnePixelInfo(updateToolTip, position, target);
+        GameObject tooltip = CreatOnePixelInfo(pixelValue, unit, position, target, status);
 
+        pixelInfos.Add(tooltip);
         //超过个数就删除
         var res = pixelInfos.FindAll(tool => tool.layer == tooltip.layer);
         if (res != null)
@@ -53,19 +54,18 @@ public class ToolTipManager : MonoBehaviour
         }
     }
 
-    private GameObject CreatOnePixelInfo(Func<string> updateToolTip, Vector3 position, GameObject target)
+    private GameObject CreatOnePixelInfo(Func<Vector2Int, float> pixelValue, string unit, Vector3 position, GameObject target, PixelInfoStatus status)
     {
         var pixelInfo = (GameObject)Instantiate(pixelInfoPrefab, Vector3.zero, Quaternion.Euler(0, 0, 0), ToolTipsParent);
         pixelInfo.transform.SetSiblingIndex(0);//设置子物体的index
         var p = pixelInfo.GetComponent<PixelInfo>();
-        p.Status = PixelInfoStatus.Active;
-        p.Show(updateToolTip, position, target);
+        p.Status = status;
+        p.Show(pixelValue, unit, position, target);
         pixelInfo.layer = (int)Mathf.Log(Camera.main.cullingMask, 2);
-        pixelInfos.Add(pixelInfo);
         return pixelInfo;
     }
 
-    public void ShowDistanceInfo(Func<float> getDistance, Vector3 start, Vector3 end, GameObject target)
+    public void ShowDistanceInfo(Func<Vector2Int, Vector3> getPixelPosition, Func<Vector2Int, float> UpdatePixelValue, Vector3 start, Vector3 end, GameObject target)
     {
         if (distancesInfos.Count > 0)
         {
@@ -74,7 +74,7 @@ public class ToolTipManager : MonoBehaviour
         }
         var distance = (GameObject)Instantiate(distanceInfoPrefab, Vector3.zero, Quaternion.Euler(0, 0, 0), ToolTipsParent);
         distance.transform.SetSiblingIndex(0);//设置子物体的index
-        distance.GetComponent<DistanceMeasurement>().Show(start, end, getDistance, target);
+        distance.GetComponent<DistanceMeasurement>().Show(start, end, getPixelPosition, UpdatePixelValue, target);
         distance.layer = (int)Mathf.Log(Camera.main.cullingMask, 2);
         distancesInfos.Add(distance);
     }
@@ -106,7 +106,7 @@ public class ToolTipManager : MonoBehaviour
         var res = pixelInfos.FindAll(tool => tool.layer == (int)Mathf.Log(Camera.main.cullingMask, 2));
         if (res != null)
         {
-            var pixelInfo= res.Find(p => p.GetComponent<PixelInfo>().Status == PixelInfoStatus.Active);
+            var pixelInfo = res.Find(p => p.GetComponent<PixelInfo>().Status == PixelInfoStatus.Active);
             if (null != pixelInfo)
             {
                 pixelInfos.Remove(pixelInfo);

@@ -10,6 +10,7 @@ public class GrayShaderHelper : ShaderHelperBase
     {
         Shader.SetFloat("vMax", GrayColorBar.VMax);
         base.Start();
+        bufferDataUnit = "LSB";
     }
 
     protected override IEnumerator MonitorUpdate()

@@ -8,24 +8,36 @@ using UnityEngine.UI;
 public class DistanceMeasurement : BaseMeshEffect
 {
     public GameObject Child;
-    Vector3 LocalStartPoint;
-    Vector3 LocalEndPoint;
-    Func<float> GetDistance;
+    Vector3 localStartPoint;
+    Vector3 localEndPoint;
+    Func<Vector2Int, Vector3> GetPixelPosition;
+    Func<Vector2Int, float> GetPixelValue;
     GameObject target;
     float width = 2;
     Color color = Color.white;
+    Vector2Int startSN;
+    Vector2Int endSN;
+    Text text;
+    void Awake()
+    {
+        text = Child.transform.GetChild(0).GetComponent<Text>();
+    }
 
+    void Start()
+    {
+        StartCoroutine(UpdateDistanceMeasurement());
+    }
     public override void ModifyMesh(VertexHelper vh)
     {
         vh.Clear();
         UIVertex[] verts = new UIVertex[4];
 
-        var start = LocalPositionToScreenPoint(LocalStartPoint);
-        var end = LocalPositionToScreenPoint(LocalEndPoint);
+        var start = LocalPositionToScreenPoint(localStartPoint);
+        var end = LocalPositionToScreenPoint(localEndPoint);
 
         var offset = this.gameObject.transform.position;
         var sita = Mathf.Atan((end.y - start.y) / (start.x - end.x));
-        verts[0].position = new Vector3(start.x - width / 2 * Mathf.Sin(sita), start.y - width / 2 * Mathf.Cos(sita))-offset;
+        verts[0].position = new Vector3(start.x - width / 2 * Mathf.Sin(sita), start.y - width / 2 * Mathf.Cos(sita)) - offset;
         verts[0].color = color;
         verts[0].uv0 = Vector2.zero;
 
@@ -43,12 +55,22 @@ public class DistanceMeasurement : BaseMeshEffect
 
         vh.AddUIVertexQuad(verts);
     }
-    public void Show(Vector3 start, Vector3 end, Func<float> getDistance, GameObject target)
+    public void Show(Vector3 start, Vector3 end, Func<Vector2Int, Vector3> getPixelPosition, Func<Vector2Int, float> updatePixelValue, GameObject target)
     {
-        this.LocalStartPoint = start;
-        this.LocalEndPoint = end;
-        this.GetDistance = getDistance;
+        this.localStartPoint = start;
+        this.localEndPoint = end;
+        this.GetPixelPosition = getPixelPosition;
         this.target = target;
+
+        this.startSN = LocalPointToPixelSN(localStartPoint);
+        this.endSN = LocalPointToPixelSN(localEndPoint);
+
+        var startP = this.transform.Find("StartPixelInfo").GetComponent<PixelInfo>();
+        startP.Status = PixelInfoStatus.Fix;
+        startP.Show(updatePixelValue, "mm", start, target);
+        var endP = this.transform.Find("EndPixelInfo").GetComponent<PixelInfo>();
+        endP.Status = PixelInfoStatus.Fix;
+        endP.Show(updatePixelValue, "mm", end, target);
     }
 
     private Vector3 LocalPositionToScreenPoint(Vector3 localPosition)
@@ -57,19 +79,42 @@ public class DistanceMeasurement : BaseMeshEffect
 
         return Camera.main.WorldToScreenPoint(worldPosition);
     }
+
+    private Vector2Int LocalPointToPixelSN(Vector3 localPoint)
+    {
+        var comm = GameObject.Find("Manager").GetComponent<Communication>();
+
+        var newPoint = localPoint + new Vector3(0.5f, -0.5f, 0);
+        newPoint = new Vector3(newPoint.x, -newPoint.y, newPoint.z);
+
+        //再将本地坐标转换为像素坐标
+        //(1.0 / comm.PixelColumn)表示一个像素占的大小
+        Vector2Int sn = new Vector2Int((int)(newPoint.x / (1.0 / comm.PixelWidth)), (int)(newPoint.y / (1.0 / comm.PixelHeight)));
+        return sn;
+    }
+
+    IEnumerator UpdateDistanceMeasurement()
+    {
+        while (true)
+        {
+            var start = LocalPositionToScreenPoint(localStartPoint);
+            var end = LocalPositionToScreenPoint(localEndPoint);
+            var v = start - end;
+            this.gameObject.transform.position = start;
+            Child.transform.localPosition = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2, 0) - this.gameObject.transform.position;
+            Child.transform.eulerAngles = new Vector3(0, 0, 180 * Mathf.Atan(v.y / v.x) / Mathf.PI);
+            if (GetPixelPosition == null)
+               yield return new WaitForSeconds(0.5f);
+
+            var dist = Vector3.Distance(GetPixelPosition.Invoke(endSN), GetPixelPosition.Invoke(startSN));
+            text.text = $"{Mathf.RoundToInt(dist)}mm";
+            this.GetComponent<Image>().SetVerticesDirty();//强制刷新顶点
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
     // Update is called once per frame
     void Update()
     {
-        var start = LocalPositionToScreenPoint(LocalStartPoint);
-        var end = LocalPositionToScreenPoint(LocalEndPoint);
-        var v = start - end;
-        this.gameObject.transform.position = start;
-        Child.transform.localPosition = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2, 0)- this.gameObject.transform.position;
-        Child.transform.eulerAngles = new Vector3(0, 0, 180 * Mathf.Atan(v.y / v.x) / Mathf.PI);
-        if (GetDistance == null)
-            return;
-        Child.transform.GetChild(0).GetComponent<Text>().text = $"{Mathf.RoundToInt(GetDistance.Invoke())}mm";
-
-        this.GetComponent<Image>().SetVerticesDirty();//强制刷新顶点
+        
     }
 }

@@ -4,29 +4,8 @@ using UnityEngine;
 
 public class GrayUserEvents : UserEventBase
 {
-    protected override string ToolTipFormat(Vector2Int sn, float value)
+    protected override void OnLeftMouseButtonDrag(Vector3 localPointStart, Vector3 localPointEnd)
     {
-        return $"{sn}:\n{value}LSB";
+        
     }
-
-    protected override void OnLeftMouseButtonHoldDown(Vector3 start, Vector3 end)
-    {
-
-    }
-
-    protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
-    {
-        base.OnRightMouseButtonDrag(pointDelta);
-    }
-
-    protected override void OnLeftMouseButtonClick(Vector3 localPoint)
-    {
-        base.OnLeftMouseButtonClick(localPoint);
-    }
-
-    protected override void OnMouseScroll(Vector2 scrollDelta)
-    {
-        base.OnMouseScroll(scrollDelta);
-    }
-
 }

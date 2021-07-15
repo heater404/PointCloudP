@@ -19,6 +19,7 @@ public class ShaderHelperBase : MonoBehaviour
     public RangeSlider Slider;
     public Toggle AutoRangeToggle;
     public string KernelName;
+    public string bufferDataUnit { get; protected set; }
     protected virtual void Awake()
     {
         if (!IsSupport())

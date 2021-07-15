@@ -23,9 +23,12 @@ public class PixelInfo : MonoBehaviour, IPointerClickHandler
     }
     private GameObject target;
     private Vector3 localPosition;
-    private Func<string> updateToolTip;
+    private Func<Vector2Int, float> GetPixelValue;
     ToolTipManager manager;
     RawImage dot;
+    Text text;
+    Vector2Int sn;
+    string unit;
     private void Awake()
     {
         manager = ToolTipManager.Instance();
@@ -34,22 +37,50 @@ public class PixelInfo : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log("Can't find  PixelInfo's Dot");
         }
+        text = this.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Text>();
+    }
+
+    private Vector2Int LocalPointToPixelSN(Vector3 localPoint)
+    {
+        var comm = GameObject.Find("Manager").GetComponent<Communication>();
+
+        var newPoint = localPoint + new Vector3(0.5f, -0.5f, 0);
+        newPoint = new Vector3(newPoint.x, -newPoint.y, newPoint.z);
+
+        //再将本地坐标转换为像素坐标
+        //(1.0 / comm.PixelColumn)表示一个像素占的大小
+        Vector2Int sn = new Vector2Int((int)(newPoint.x / (1.0 / comm.PixelWidth)), (int)(newPoint.y / (1.0 / comm.PixelHeight)));
+        return sn;
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        StartCoroutine(UpdatePixelInfo());
+    }
 
+    IEnumerator UpdatePixelInfo()
+    {
+        while (true)
+        {
+            if (target == null || localPosition == null || GetPixelValue == null)
+                yield return new WaitForSeconds(0.5f);
+
+            text.text = PixelInfoFormat(sn, GetPixelValue.Invoke(sn), unit);
+            this.gameObject.transform.position = LocalPositionToScreenPoint(localPosition);
+            yield return new WaitForSeconds(0.5f);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (target == null || localPosition == null || updateToolTip == null)
-            return;
+        
+    }
 
-        this.gameObject.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = updateToolTip?.Invoke();
-        this.gameObject.transform.position = LocalPositionToScreenPoint(localPosition);
+    private string PixelInfoFormat(Vector2Int sn, float pixelValue, string unit)
+    {
+        return $"{sn}:\n{pixelValue}{unit}";
     }
 
     /// <summary>
@@ -61,11 +92,13 @@ public class PixelInfo : MonoBehaviour, IPointerClickHandler
     /// </summary>
     /// <param name="message"></param>
     /// <param name="position"></param>
-    public void Show(Func<string> updateToolTip, Vector3 position, GameObject target)
+    public void Show(Func<Vector2Int, float> pixelValue, string unit, Vector3 position, GameObject target)
     {
         this.target = target;
-        this.updateToolTip = updateToolTip;
+        this.GetPixelValue = pixelValue;
         this.localPosition = position;
+        this.sn = LocalPointToPixelSN(localPosition);
+        this.unit = unit;
     }
 
     private Vector3 LocalPositionToScreenPoint(Vector3 localPosition)
@@ -77,14 +110,14 @@ public class PixelInfo : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Right && !Input.GetKey(KeyCode.LeftControl))
+        if (eventData.button == PointerEventData.InputButton.Left)
         {
             if (this.status == PixelInfoStatus.Active)
                 this.Status = PixelInfoStatus.Fix;
             else
                 this.Status = PixelInfoStatus.Active;
         }
-        else if (eventData.button == PointerEventData.InputButton.Right && Input.GetKey(KeyCode.LeftControl))
+        else if (eventData.button == PointerEventData.InputButton.Right)
         {
             manager.DestoryOnePixelInfo(this.gameObject);
         }

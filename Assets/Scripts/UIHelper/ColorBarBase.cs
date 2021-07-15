@@ -27,12 +27,12 @@ public abstract class ColorBarBase : BaseMeshEffect
         markTextXPos = selfWidth + parentWidth;
 
         InitColorMarkTexts();
-    }
 
-    protected void Update()
-    {
-        UpdateColorMarkText(this.Range.LowValue, this.Range.HighValue);
-        UpdateColorMarkTextUnit(markTextPrefab);
+        Range.OnValueChanged.AddListener((l, h) =>
+        {
+            UpdateColorMarkText(l, h);
+            UpdateColorMarkTextUnit(markTextPrefab);
+        });
     }
 
     private void InitColorMarkTexts()
@@ -218,6 +218,14 @@ public abstract class ColorBarBase : BaseMeshEffect
 
             vh.AddUIVertexQuad(verts0);
         }
+        StartCoroutine(UpdateColorMarkText());
+    }
+
+    IEnumerator UpdateColorMarkText()
+    {
+        yield return new WaitForSeconds(0);
+        UpdateColorMarkText(this.Range.LowValue, this.Range.HighValue);
+        UpdateColorMarkTextUnit(markTextPrefab);
     }
 
     protected abstract string MarkFormat(float value);

@@ -21,6 +21,7 @@ public class DepthShaderHelper : ShaderHelperBase
         pointsBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 12);//Vector3;
         colorBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 16);//Color;rgba四个float组成
         confidenceBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 4);
+        bufferDataUnit = "mm";
     }
 
     protected override void Start()

@@ -1,35 +1,11 @@
 using UnityEngine;
 public class DepthUserEvents : UserEventBase
 {
-    protected override string ToolTipFormat(Vector2Int sn, float value)
+    protected override void OnLeftMouseButtonDrag(Vector3 localPointStart, Vector3 localPointEnd)
     {
-        return $"{sn}:\n{value}mm";
-    }
+        var pixelSNStart = LocalPointToPixelSN(localPointStart);
+        var pixelSNEnd = LocalPointToPixelSN(localPointEnd);
 
-    protected override void OnLeftMouseButtonHoldDown(Vector3 start, Vector3 end)
-    {
-        base.OnLeftMouseButtonHoldDown(start, end);
-    }
-
-    protected override void OnMouseScroll(Vector2 scrollDelta)
-    {
-        base.OnMouseScroll(scrollDelta);
-    }
-
-    protected override void OnLeftMouseButtonClick(Vector3 localPoint)
-    {
-        base.OnLeftMouseButtonClick(localPoint);
-    }
-
-    protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
-    {
-        base.OnRightMouseButtonDrag(pointDelta);
-    }
-
-    protected override void OnMouseExit()
-    {
-        base.OnMouseExit();
-        if (Input.GetMouseButton(0))
-            ToolTipManager.Instance().DestoryDistanceInfo();
+        ToolTipManager.Instance().ShowDistanceInfo(helper.GetPointData, helper.GetBufferData, localPointStart, localPointEnd, this.gameObject);
     }
 }

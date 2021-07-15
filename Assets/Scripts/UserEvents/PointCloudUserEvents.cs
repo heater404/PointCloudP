@@ -12,31 +12,7 @@ public class PointCloudUserEvents : UserEventBase
         base.scaleSpeed = 200.1f;//±‹√‚≥ˆœ÷0
         base.moveSpeed = 0.2f;
     }
-    private void Awake()
-    {
 
-    }
-
-
-    protected override void OnLeftMouseButtonClick(Vector3 localPoint)
-    {
-        //Debug.Log($"OnLeftMouseButtonDown:{localPoint}");
-    }
-
-    protected override void OnMouseScroll(Vector2 scrollDelta)
-    {
-        base.OnMouseScroll(scrollDelta);
-    }
-
-    protected override void OnLeftMouseButtonHoldDown(Vector3 start, Vector3 end)
-    {
-        //base.OnLeftMouseButtonHoldDown(start, end);
-    }
-
-    protected override void OnMouseExit()
-    {
-        //base.OnMouseExit();
-    }
 
     protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
     {
@@ -44,5 +20,15 @@ public class PointCloudUserEvents : UserEventBase
             Camera.main.transform.RotateAround(center.transform.position, Vector3.up, pointDelta.x * moveSpeed);
         else
             Camera.main.transform.RotateAround(center.transform.position, Vector3.right, -pointDelta.y * moveSpeed);
+    }
+
+    protected override void OnLeftMouseButtonDrag(Vector3 localPointStart, Vector3 localPointEnd)
+    {
+        
+    }
+
+    protected override void OnLeftMouseButtonClick(Vector3 localPoint, PixelInfoStatus status = PixelInfoStatus.Active)
+    {
+        
     }
 }
