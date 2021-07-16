@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class DistanceMeasurement : BaseMeshEffect
+public class DistanceMeasurement : BaseMeshEffect, IPointerClickHandler
 {
     public GameObject Child;
     Vector3 localStartPoint;
@@ -18,13 +18,16 @@ public class DistanceMeasurement : BaseMeshEffect
     Vector2Int startSN;
     Vector2Int endSN;
     Text text;
-    void Awake()
+
+    protected override void Awake()
     {
+        base.Awake();
         text = Child.transform.GetChild(0).GetComponent<Text>();
     }
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         StartCoroutine(UpdateDistanceMeasurement());
     }
     public override void ModifyMesh(VertexHelper vh)
@@ -104,7 +107,7 @@ public class DistanceMeasurement : BaseMeshEffect
             Child.transform.localPosition = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2, 0) - this.gameObject.transform.position;
             Child.transform.eulerAngles = new Vector3(0, 0, 180 * Mathf.Atan(v.y / v.x) / Mathf.PI);
             if (GetPixelPosition == null)
-               yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.5f);
 
             var dist = Vector3.Distance(GetPixelPosition.Invoke(endSN), GetPixelPosition.Invoke(startSN));
             text.text = $"{Mathf.RoundToInt(dist)}mm";
@@ -112,9 +115,12 @@ public class DistanceMeasurement : BaseMeshEffect
             yield return new WaitForSeconds(0.5f);
         }
     }
-    // Update is called once per frame
-    void Update()
+    public void OnPointerClick(PointerEventData eventData)
     {
-        
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            ToolTipManager.Instance().DestoryDistanceInfo();
+        }
     }
 }
+

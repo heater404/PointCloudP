@@ -11,14 +11,9 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
     protected float moveSpeed = 0.003f;
     protected ShaderHelperBase helper;
     // Start is called before the first frame update
-    void Awake()
+   protected virtual void Awake()
     {
         comm = GameObject.Find("Manager").GetComponent<Communication>();
-    }
-    protected virtual void Start()
-    {
-        this.gameObject.transform.localScale = new Vector3(comm.PixelWidth / (comm.PixelHeight * 1.0f), 1, 1) * 1.5f;
-
         helper = this.gameObject.GetComponent<ShaderHelperBase>();
     }
 
@@ -82,7 +77,7 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
     }
 
     protected abstract void OnLeftMouseButtonDrag(Vector3 localPointStart, Vector3 localPointEnd);
-    
+
     public void OnScroll(PointerEventData eventData)
     {
         OnMouseScroll(eventData.scrollDelta);

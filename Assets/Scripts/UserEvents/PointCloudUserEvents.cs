@@ -6,13 +6,12 @@ public class PointCloudUserEvents : UserEventBase
 {
     // Start is called before the first frame update
     GameObject center;
-    protected override void Start()
+    void Start()
     {
         center = this.gameObject.GetComponent<PointCloud>().PointCloudCenter;
         base.scaleSpeed = 200.1f;//±‹√‚≥ˆœ÷0
         base.moveSpeed = 0.2f;
     }
-
 
     protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
     {

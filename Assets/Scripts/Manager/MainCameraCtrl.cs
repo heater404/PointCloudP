@@ -46,6 +46,22 @@ public class MainCameraCtrl : MonoBehaviour
             Camera.main.transform.RotateAround(PointCloud.parent.position, Vector3.up, 90);
 
         });
+
+        var count = Camera.allCamerasCount;
+        for (int i = 0; i < count; i++)
+        {
+            if (i != 0)//非MainCamera
+            {
+                CameraParams camera = new CameraParams
+                {
+                    Position = Camera.allCameras[i].transform.position,
+                    EulerAngles = Camera.allCameras[i].transform.eulerAngles,
+                    Size = Camera.allCameras[i].orthographicSize,
+                    Layer = (int)Mathf.Log(Camera.allCameras[i].cullingMask, 2),
+                };
+                CamerasParams.Add(camera);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -113,21 +129,7 @@ public class MainCameraCtrl : MonoBehaviour
 
     void Awake()
     {
-        var count = Camera.allCamerasCount;
-        for (int i = 0; i < count; i++)
-        {
-            if (i != 0)//非MainCamera
-            {
-                CameraParams camera = new CameraParams
-                {
-                    Position = Camera.allCameras[i].transform.position,
-                    EulerAngles = Camera.allCameras[i].transform.eulerAngles,
-                    Size = Camera.allCameras[i].orthographicSize,
-                    Layer = (int)Mathf.Log(Camera.allCameras[i].cullingMask, 2),
-                };
-                CamerasParams.Add(camera);
-            }
-        }
+        
     }
 }
 
