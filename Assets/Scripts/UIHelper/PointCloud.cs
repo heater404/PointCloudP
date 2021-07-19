@@ -5,7 +5,6 @@ using UnityEngine;
 public class PointCloud : MonoBehaviour
 {
     Communication comm;
-    public GameObject PointCloudCenter { get; set; }
     private const int MaxPointNumPerGroup = 65000;
     private int totalPointNum;
     private int pointNumPerGroup = MaxPointNumPerGroup;
