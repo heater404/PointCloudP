@@ -7,7 +7,7 @@ public class OrtCameraManager : MonoBehaviour
     public GameObject Obj;//要包围的物体
     Camera SetCamera;//正交相机
     public float ScreenScaleFactor;//占屏比例系数
-
+    const float SizeMargin= 0.05f;
     private void Awake()
     {
         SetCamera = this.GetComponent<Camera>();
@@ -19,7 +19,7 @@ public class OrtCameraManager : MonoBehaviour
         var center = bound.center;
         var extents = bound.extents;
         SetCamera.transform.position = new Vector3(center.x, center.y, center.z - 10);
-        SetOrthCameraSize((center.x - extents.x),(center.x + extents.x),(center.y - extents.y),(center.y + extents.y));
+        SetOrthCameraSize((center.x - extents.x), (center.x + extents.x), (center.y - extents.y), (center.y + extents.y));
     }
     /// <summary>
     /// 获取物体包围盒
@@ -64,8 +64,8 @@ public class OrtCameraManager : MonoBehaviour
         float sizeX = xDis / ScreenScaleFactor / 2 / SetCamera.aspect;
         float sizeY = yDis / ScreenScaleFactor / 2;
         if (sizeX >= sizeY)
-            SetCamera.orthographicSize = sizeX;
+            SetCamera.orthographicSize = sizeX + SizeMargin;
         else
-            SetCamera.orthographicSize = sizeY;
+            SetCamera.orthographicSize = sizeY + SizeMargin;
     }
 }
