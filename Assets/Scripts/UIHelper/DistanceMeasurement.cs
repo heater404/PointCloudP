@@ -28,7 +28,6 @@ public class DistanceMeasurement : BaseMeshEffect, IPointerClickHandler
     protected override void Start()
     {
         base.Start();
-        StartCoroutine(UpdateDistanceMeasurement());
     }
     public override void ModifyMesh(VertexHelper vh)
     {
@@ -96,25 +95,32 @@ public class DistanceMeasurement : BaseMeshEffect, IPointerClickHandler
         return sn;
     }
 
-    IEnumerator UpdateDistanceMeasurement()
+    void UpdateDistanceMeasurement()
     {
-        while (true)
-        {
-            var start = LocalPositionToScreenPoint(localStartPoint);
-            var end = LocalPositionToScreenPoint(localEndPoint);
-            var v = start - end;
-            this.gameObject.transform.position = start;
-            Child.transform.localPosition = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2, 0) - this.gameObject.transform.position;
-            Child.transform.eulerAngles = new Vector3(0, 0, 180 * Mathf.Atan(v.y / v.x) / Mathf.PI);
-            if (GetPixelPosition == null)
-                yield return new WaitForSeconds(0.5f);
+        var start = LocalPositionToScreenPoint(localStartPoint);
+        var end = LocalPositionToScreenPoint(localEndPoint);
+        var v = start - end;
+        this.gameObject.transform.position = start;
+        Child.transform.localPosition = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2, 0) - this.gameObject.transform.position;
+        Child.transform.eulerAngles = new Vector3(0, 0, 180 * Mathf.Atan(v.y / v.x) / Mathf.PI);
+        if (GetPixelPosition == null)
+            return;
 
-            var dist = Vector3.Distance(GetPixelPosition.Invoke(endSN), GetPixelPosition.Invoke(startSN));
-            text.text = $"{Mathf.RoundToInt(dist)}mm";
-            this.GetComponent<Image>().SetVerticesDirty();//强制刷新顶点
-            yield return new WaitForSeconds(0.5f);
+        var dist = Vector3.Distance(GetPixelPosition.Invoke(endSN), GetPixelPosition.Invoke(startSN));
+        text.text = $"{Mathf.RoundToInt(dist)}mm";
+        this.GetComponent<Image>().SetVerticesDirty();//强制刷新顶点
+    }
+
+    int frameCount = 0;
+    void Update()
+    {
+        if (++frameCount == 10)
+        {
+            UpdateDistanceMeasurement();
+            frameCount = 0;
         }
     }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)

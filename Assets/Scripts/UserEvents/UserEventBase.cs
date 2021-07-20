@@ -11,7 +11,7 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
     protected float moveSpeed = 0.003f;
     protected ShaderHelperBase helper;
     // Start is called before the first frame update
-   protected virtual void Awake()
+    protected virtual void Awake()
     {
         comm = GameObject.Find("Manager").GetComponent<Communication>();
         helper = this.gameObject.GetComponent<ShaderHelperBase>();
@@ -52,6 +52,7 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
         return sn;
     }
 
+    Vector3 lastRaycastWorldPosition;
     public void OnDrag(PointerEventData eventData)
     {
         if (eventData.dragging && eventData.button == PointerEventData.InputButton.Right)
@@ -68,10 +69,15 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
             {
                 Vector3 localPointStart = this.gameObject.transform.InverseTransformPoint(
                    eventData.pointerPressRaycast.worldPosition);
+                
+                if (Vector3.zero != eventData.pointerCurrentRaycast.worldPosition)
+                {
+                    lastRaycastWorldPosition = eventData.pointerCurrentRaycast.worldPosition;
+                }
                 Vector3 localPointEnd = this.gameObject.transform.InverseTransformPoint(
-                  eventData.pointerCurrentRaycast.worldPosition);
-                if (Vector3.zero != localPointEnd)
-                    OnLeftMouseButtonDrag(localPointStart, localPointEnd);
+                  lastRaycastWorldPosition);
+
+                OnLeftMouseButtonDrag(localPointStart, localPointEnd);
             }
         }
     }
@@ -86,7 +92,7 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left
-           && eventData.clickCount == 1)
+           && eventData.clickCount == 1 && !eventData.dragging)
         {
             Vector3 localPoint = this.gameObject.transform.InverseTransformPoint(
                 eventData.pointerCurrentRaycast.worldPosition);

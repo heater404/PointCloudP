@@ -10,7 +10,7 @@ public class MainCameraCtrl : MonoBehaviour
     public Button TopViewBtn;
     public Button SideViewBtn;
     public Button[] ResetBtns;
-    public Transform PointCloud;
+    public BoxCollider PointCloudBox;
     public RectTransform Left;
     public RectTransform Top;
     public RectTransform Right;
@@ -35,7 +35,7 @@ public class MainCameraCtrl : MonoBehaviour
             var camera = GetCurrentMiniViewCamera();
             Camera.main.transform.position = camera.transform.position;
             Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
-            Camera.main.transform.RotateAround(PointCloud.parent.position, Vector3.right, 90);
+            Camera.main.transform.RotateAround(PointCloudBox.center, Vector3.right, 90);
         });
 
         SideViewBtn.onClick.AddListener(() =>
@@ -43,7 +43,7 @@ public class MainCameraCtrl : MonoBehaviour
             var camera = GetCurrentMiniViewCamera();
             Camera.main.transform.position = camera.transform.position;
             Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
-            Camera.main.transform.RotateAround(PointCloud.parent.position, Vector3.up, 90);
+            Camera.main.transform.RotateAround(PointCloudBox.center, Vector3.up, 90);
 
         });
 

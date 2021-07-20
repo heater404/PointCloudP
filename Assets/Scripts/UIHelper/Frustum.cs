@@ -9,7 +9,7 @@ public class Frustum : MonoBehaviour
     public Material material;
     PointCloud pointCloud;
 
-    const float MaxDepth = 6500f;
+    const float MaxDepth = 5000f;
     private void Awake()
     {
         comm = GameObject.Find("Manager").GetComponent<Communication>();
@@ -22,17 +22,17 @@ public class Frustum : MonoBehaviour
         var pZero = Vector3.zero;
 
         //计算像素矩阵的四个角的坐标，默认最大深度值为6500mm
-        var zLeftTop = MaxDepth / pointCloud.TransCoe[0].z;
+        var zLeftTop = MaxDepth;/// pointCloud.TransCoe[0].z;
         var pLeftTop = new Vector3(zLeftTop * pointCloud.TransCoe[0].x, zLeftTop * pointCloud.TransCoe[0].y, zLeftTop);
 
-        var zRightTop = MaxDepth / pointCloud.TransCoe[comm.PixelWidth - 1].z;
+        var zRightTop = MaxDepth;// / pointCloud.TransCoe[comm.PixelWidth - 1].z;
         var pRightTop = new Vector3(zRightTop * pointCloud.TransCoe[comm.PixelWidth - 1].x, zRightTop * pointCloud.TransCoe[comm.PixelWidth - 1].y, zRightTop);
 
-        var zRightBottom = MaxDepth / pointCloud.TransCoe[comm.PixelWidth * comm.PixelHeight - 1].z;
+        var zRightBottom = MaxDepth;/// pointCloud.TransCoe[comm.PixelWidth * comm.PixelHeight - 1].z;
         var pRightBottom = new Vector3(zRightBottom * pointCloud.TransCoe[comm.PixelWidth * comm.PixelHeight - 1].x,
             zRightBottom * pointCloud.TransCoe[comm.PixelWidth * comm.PixelHeight - 1].y, zRightBottom);
 
-        var zLeftBottom = MaxDepth / pointCloud.TransCoe[comm.PixelWidth * (comm.PixelHeight - 1)].z;
+        var zLeftBottom = MaxDepth;/// pointCloud.TransCoe[comm.PixelWidth * (comm.PixelHeight - 1)].z;
         var pLeftBottom = new Vector3(zLeftBottom * pointCloud.TransCoe[comm.PixelWidth * (comm.PixelHeight - 1)].x,
             zLeftBottom * pointCloud.TransCoe[comm.PixelWidth * (comm.PixelHeight - 1)].y, zLeftBottom);
 

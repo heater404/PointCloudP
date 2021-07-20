@@ -56,26 +56,27 @@ public class PixelInfo : MonoBehaviour, IPointerClickHandler
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(UpdatePixelInfo());
+        //StartCoroutine(UpdatePixelInfo());
     }
 
-    IEnumerator UpdatePixelInfo()
+    void UpdatePixelInfo()
     {
-        while (true)
-        {
-            if (target == null || localPosition == null || GetPixelValue == null)
-                yield return new WaitForSeconds(0.5f);
+        if (target == null || localPosition == null || GetPixelValue == null)
+            return;
 
-            text.text = PixelInfoFormat(sn, GetPixelValue.Invoke(sn), unit);
-            this.gameObject.transform.position = LocalPositionToScreenPoint(localPosition);
-            yield return new WaitForSeconds(0.5f);
-        }
+        text.text = PixelInfoFormat(sn, GetPixelValue.Invoke(sn), unit);
+        this.gameObject.transform.position = LocalPositionToScreenPoint(localPosition);
     }
 
+    int frameCount = 0;
     // Update is called once per frame
     void Update()
     {
-        
+        if (++frameCount == 10)
+        {
+            UpdatePixelInfo();
+            frameCount = 0;
+        }
     }
 
     private string PixelInfoFormat(Vector2Int sn, float pixelValue, string unit)
