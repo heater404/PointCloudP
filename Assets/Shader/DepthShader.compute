@@ -54,10 +54,10 @@ float Normalize(float v, float max, float min) {
 	//	v = min + 0.0001;
 	//return log10(1 + 10 * (v - min) / (max - min)) * 0.96;//非线性映射
 	//return pow((v-min)/(max-min), 0.2);
-	/*if (v < min)
+	if (v < min)
 		return 0;
 	if (v > max)
-		return 1;*/
+		return 1;
 
 	return ((v - min) / (max - min));
 }
