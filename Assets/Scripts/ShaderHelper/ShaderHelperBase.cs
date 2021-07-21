@@ -18,6 +18,7 @@ public class ShaderHelperBase : MonoBehaviour
     protected int frameCount = 0;
     public RangeSlider Slider;
     public Toggle AutoRangeToggle;
+    public Toggle ConvergenceToggle;
     public string KernelName;
     public string bufferDataUnit { get; protected set; }
     protected virtual void Awake()
@@ -78,15 +79,17 @@ public class ShaderHelperBase : MonoBehaviour
             Slider.HighValue = max;
             frameCount++;
         }
-
-        Parallel.For(0, data.Length, i =>
-          {
-              if (data[i] > max)
-                  data[i] = max;
-              else if (data[i] < min)
-                  data[i] = min;
-          });
-
+        if (ConvergenceToggle.isOn)
+        {
+            Parallel.For(0, data.Length, i =>
+            {
+                if (data[i] > max)
+                    data[i] = max;
+                else if (data[i] < min)
+                    data[i] = min;
+            });
+        }
+        
         //每次更新当前所有点的深度值，即该点到球心的值
         buffer.SetData(data);
 
