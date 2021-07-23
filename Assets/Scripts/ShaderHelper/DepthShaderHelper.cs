@@ -69,7 +69,14 @@ public class DepthShaderHelper : ShaderHelperBase
         Vector3[] array = new Vector3[comm.PixelWidth * comm.PixelHeight];
         pointsBuffer.GetData(array);
 
-        var sn = comm.PixelWidth * position.y + position.x;
+        var x = position.x;
+        var y = position.y;
+        if (HorizontalMirrorToggle.isOn)
+            x = comm.PixelWidth - x - 1;
+        if (VerticalMirrorToggle.isOn)
+            y = comm.PixelHeight - y - 1;
+
+        var sn = comm.PixelWidth * y + x;
 
         return array[sn];
     }

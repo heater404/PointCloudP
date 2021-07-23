@@ -123,8 +123,14 @@ public class ShaderHelperBase : MonoBehaviour
     {
         float[] array = new float[comm.PixelWidth * comm.PixelHeight];
         buffer.GetData(array);
+        var x = position.x;
+        var y = position.y;
+        if (HorizontalMirrorToggle.isOn)
+            x = comm.PixelWidth - x - 1;
+        if (VerticalMirrorToggle.isOn)
+            y = comm.PixelHeight - y - 1;
 
-        var sn = comm.PixelWidth * position.y + position.x;
+        var sn = comm.PixelWidth * y + x;
 
         return array[sn];
     }
