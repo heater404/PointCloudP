@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PointCloudUserEvents : UserEventBase
 {
+
     // Start is called before the first frame update
     void Start()
     {
@@ -15,7 +16,8 @@ public class PointCloudUserEvents : UserEventBase
 
     protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
     {
-        Vector3 center; center = this.GetComponent<BoxCollider>().center;
+        Vector3 center = Camera.main.GetComponent<MainCameraCtrl>().PointCloudCenter;
+
         if (Mathf.Abs(pointDelta.x) > Mathf.Abs(pointDelta.y))
             Camera.main.transform.RotateAround(center, Vector3.up, pointDelta.x * moveSpeed);
         else

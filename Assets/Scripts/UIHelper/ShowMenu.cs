@@ -15,12 +15,12 @@ public class ShowMenu : MonoBehaviour
             Debug.Log("ShowBtn == null || Menu == null");
             return;
         }
-        Menu.SetActive(false);
+        
         ShowBtn.onClick.AddListener(() =>
         {
             Menu.SetActive(!Menu.activeInHierarchy);
         });
-
+        Menu.SetActive(false);
         //点击菜单中一个按钮后自动关闭Menu
         var count = Menu.transform.childCount;
         for (int i = 0; i < count; i++)

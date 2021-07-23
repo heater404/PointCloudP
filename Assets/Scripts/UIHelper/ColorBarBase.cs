@@ -1,10 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
+using System.Linq;
+public class Average
+{
+    List<float> data = new List<float>();
+    public bool CalcAverage(float value, out float average)
+    {
+        average = 0;
+        data.Add(value);
+        if (data.Count < 5)
+            return false;
+        else
+        {
+            data.Remove(Mathf.Max(data.ToArray()));
+            data.Remove(Mathf.Min(data.ToArray()));
+            average = data.Average();
+            data.RemoveAt(0);
+        }
+        return true;
+    }
+}
 
 public abstract class ColorBarBase : BaseMeshEffect
 {
@@ -18,6 +39,11 @@ public abstract class ColorBarBase : BaseMeshEffect
     float markTextXPos;
     const string ColorMarkTextBaseName = "ColorMarkText";
     GameObject markTextPrefab;
+    float lastLowValue, lastHightValue;
+
+    Average low =new Average();
+    Average hight = new Average();
+
     protected new void Start()
     {
         markTextPrefab = (GameObject)Resources.Load("Prefabs/ColorMarkText", typeof(GameObject));
@@ -30,7 +56,18 @@ public abstract class ColorBarBase : BaseMeshEffect
 
         Range.OnValueChanged.AddListener((l, h) =>
         {
-            UpdateColorMarkText(l, h);
+            float low,hight;
+            if (this.low.CalcAverage(l, out low))
+                lastLowValue = low;
+            else
+                return;
+
+            if (this.hight.CalcAverage(h, out hight))
+                lastHightValue = hight;
+            else
+                return;
+
+            UpdateColorMarkText(lastLowValue, lastHightValue);
             UpdateColorMarkTextUnit(markTextPrefab);
         });
     }

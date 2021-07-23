@@ -7,7 +7,6 @@ TagManager:
   - Depth
   - Gray
   - PointCloud
-  - ToolTip
   layers:
   - Default
   - TransparentFX
@@ -20,7 +19,7 @@ TagManager:
   - Depth
   - Gray
   - PointCloud
-  - 
+  - Depth&PointCloud
   - 
   - 
   - 

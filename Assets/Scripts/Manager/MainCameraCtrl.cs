@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UI.Extensions;
+using System.Linq;
 
 public class MainCameraCtrl : MonoBehaviour
 {
@@ -10,12 +12,15 @@ public class MainCameraCtrl : MonoBehaviour
     public Button TopViewBtn;
     public Button SideViewBtn;
     public Button[] ResetBtns;
-    public BoxCollider PointCloudBox;
     public RectTransform Left;
     public RectTransform Top;
     public RectTransform Right;
     public RectTransform Bottom;
     // Use this for initialization
+
+    public RangeSlider DepthRange;
+    public BoxCollider PointCloudBox;
+    public Vector3 PointCloudCenter { get; set; }
     void Start()
     {
         foreach (var reset in ResetBtns)
@@ -35,7 +40,7 @@ public class MainCameraCtrl : MonoBehaviour
             var camera = GetCurrentMiniViewCamera();
             Camera.main.transform.position = camera.transform.position;
             Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
-            Camera.main.transform.RotateAround(PointCloudBox.center, Vector3.right, 90);
+            Camera.main.transform.RotateAround(PointCloudCenter, Vector3.right, 90);
         });
 
         SideViewBtn.onClick.AddListener(() =>
@@ -43,14 +48,14 @@ public class MainCameraCtrl : MonoBehaviour
             var camera = GetCurrentMiniViewCamera();
             Camera.main.transform.position = camera.transform.position;
             Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
-            Camera.main.transform.RotateAround(PointCloudBox.center, Vector3.up, 90);
+            Camera.main.transform.RotateAround(PointCloudCenter, Vector3.up, 90);
 
         });
 
         var count = Camera.allCamerasCount;
         for (int i = 0; i < count; i++)
         {
-            if (i != 0)//非MainCamera
+            if (Camera.allCameras[i] != Camera.main)//非MainCamera
             {
                 CameraParams camera = new CameraParams
                 {
@@ -62,6 +67,20 @@ public class MainCameraCtrl : MonoBehaviour
                 CamerasParams.Add(camera);
             }
         }
+
+        PointCloudCenter = PointCloudBox.center;
+        DepthRange.OnValueChanged.AddListener((l, h) =>
+        {
+            if (Camera.main.cullingMask == 1 << LayerMask.NameToLayer("PointCloud"))
+            {
+                var delta = (l + h) / 2 - PointCloudCenter.z;
+
+                PointCloudCenter = new Vector3(PointCloudCenter.x, PointCloudCenter.y, (l + h) / 2);
+
+                var originPos = Camera.main.transform.position;
+                Camera.main.transform.position = new Vector3(originPos.x, originPos.y, originPos.z + delta);
+            }
+        });
     }
 
     // Update is called once per frame
@@ -84,12 +103,25 @@ public class MainCameraCtrl : MonoBehaviour
 
     }
 
+    private CameraParams GetCameraParams(string layerName)
+    {
+        var layer = LayerMask.NameToLayer(layerName);
+        var paras = CamerasParams.Find(param => param.Layer == layer);
+        return paras;
+    }
+
+    private CameraParams GetCameraParams(int layer)
+    {
+        var paras = CamerasParams.Find(param => param.Layer == layer);
+        return paras;
+    }
+
     Camera GetCurrentMiniViewCamera()
     {
         var count = Camera.allCamerasCount;
         for (int i = 0; i < count; i++)
         {
-            if (i != 0)//非MainCamera
+            if (Camera.allCameras[i] != Camera.main)//非MainCamera
             {
                 var camera = Camera.allCameras[i];
                 if (camera.cullingMask == Camera.main.cullingMask)
@@ -106,30 +138,30 @@ public class MainCameraCtrl : MonoBehaviour
     {
         SaveCurrentCameraParam();
 
-        var camera = CamerasParams.Find(param => param.Layer == LayerMask.NameToLayer(targetLayer));
+        var paras = GetCameraParams(targetLayer);
 
-        Camera.main.transform.position = camera.Position;
-        Camera.main.transform.eulerAngles = camera.EulerAngles;
-        Camera.main.orthographicSize = camera.Size;
-        Camera.main.cullingMask = 1 << camera.Layer;
+        Camera.main.transform.position = paras.Position;
+        Camera.main.transform.eulerAngles = paras.EulerAngles;
+        Camera.main.orthographicSize = paras.Size;
+        Camera.main.cullingMask = 1 << paras.Layer;
     }
 
     private void SaveCurrentCameraParam()
     {
         var currentLayer = (int)Mathf.Log(Camera.main.cullingMask, 2);
 
-        var camera = CamerasParams.Find(param => param.Layer == currentLayer);
-        if (camera != null)
+        var paras = GetCameraParams(currentLayer);
+        if (paras != null)
         {
-            camera.Position = Camera.main.transform.position;
-            camera.EulerAngles = Camera.main.transform.eulerAngles;
-            camera.Size = Camera.main.orthographicSize;
+            paras.Position = Camera.main.transform.position;
+            paras.EulerAngles = Camera.main.transform.eulerAngles;
+            paras.Size = Camera.main.orthographicSize;
         }
     }
 
     void Awake()
     {
-        
+
     }
 }
 

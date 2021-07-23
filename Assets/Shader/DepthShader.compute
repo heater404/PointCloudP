@@ -72,12 +72,16 @@ void DepthKernel(uint3 id : SV_DispatchThreadID)
 	float normal = Normalize(buffer[i], max, min);
 	renderTexture[id.xy] = HSVToRGB(normal * 360* hMax, 1, 1);
 
-	colors[i] = renderTexture[id.xy];
-		
-	points[i].z = buffer[i];//XYZ格式
-	points[i].x = coe[i].x * points[i].z;
-	points[i].y = coe[i].y * points[i].z;
-
 	if (confidence[i] < confidenceT)
+	{
 		points[i] = float3(0, 0, 0);
+		renderTexture[id.xy] = float4(0.188f, 0.188f, 0.188f, 1);
+	}
+	else
+	{
+		points[i].z = buffer[i];//XYZ格式
+		points[i].x = coe[i].x * points[i].z;
+		points[i].y = coe[i].y * points[i].z;
+	}
+	colors[i] = renderTexture[id.xy];
 }

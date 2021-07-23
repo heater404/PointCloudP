@@ -9,7 +9,7 @@ public class Frustum : MonoBehaviour
     public Material material;
     PointCloud pointCloud;
 
-    const float MaxDepth = 5000f;
+    const float MaxDepth = 6500f;
     private void Awake()
     {
         comm = GameObject.Find("Manager").GetComponent<Communication>();
@@ -76,16 +76,6 @@ public class Frustum : MonoBehaviour
 
         frustumMesh.vertices = vectices;
         frustumMesh.SetIndices(indexs, MeshTopology.LineStrip, 0);
-
-        ////还需要把当前相机的XY坐标保持一致
-        //foreach (var cam in Camera.allCameras)
-        //{
-        //    if (cam.cullingMask == 1 << LayerMask.NameToLayer("PointCloud"))
-        //    {
-        //        cam.transform.position = new Vector3(center.x, center.y, cam.transform.position.z);
-        //        break;
-        //    }
-        //}
     }
 
     // Update is called once per frame
