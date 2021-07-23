@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
 using System.Linq;
+using System.IO;
+using System;
 
 public class MainCameraCtrl : MonoBehaviour
 {

@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.UI;
+using System.Linq;
 
 public class DepthShaderHelper : ShaderHelperBase
 {
@@ -17,6 +18,14 @@ public class DepthShaderHelper : ShaderHelperBase
     protected override void Awake()
     {
         base.Awake();
+        Save.onClick.AddListener(() =>
+        {
+            SaveRenderTexture("Depth");
+
+            var camera = Camera.allCameras.First(c => (int)Mathf.Log(c.cullingMask, 2) == LayerMask.NameToLayer("PointCloud"));
+            SaveRenderTexture(camera.activeTexture, "PointCloud");
+        });
+
         coefficient = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 12);//Vector3
         pointsBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 12);//Vector3;
         colorBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 16);//Color;rgba四个float组成

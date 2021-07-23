@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,8 +12,8 @@ public class ShaderHelperBase : MonoBehaviour
 {
     public ComputeShader Shader; //GPU计算Shader
     protected int kernel;//m_CShader中指定的一个计算函数入口编号
-    public RenderTexture texture { get; private set; }//相位图渲染使用的纹理，该纹理各点的颜色由该点的相位值决定
-    public ComputeBuffer buffer;//输入的各点当前到球心的距离值，球心就是摄像机的位置，摄像机采集的各点的相位值即可转化为距离值，即深度信息
+    protected RenderTexture texture;//相位图渲染使用的纹理，该纹理各点的颜色由该点的相位值决定
+    protected ComputeBuffer buffer;//输入的各点当前到球心的距离值，球心就是摄像机的位置，摄像机采集的各点的相位值即可转化为距离值，即深度信息
     protected Communication comm;
 
     protected float min;
@@ -20,7 +23,7 @@ public class ShaderHelperBase : MonoBehaviour
     public Toggle AutoRangeToggle;
     public Toggle ConvergenceToggle;
     public string KernelName;
-
+    public Button Save;
     public Toggle HorizontalMirrorToggle;
     public Toggle VerticalMirrorToggle;
     public string bufferDataUnit { get; protected set; }
@@ -92,7 +95,7 @@ public class ShaderHelperBase : MonoBehaviour
                     data[i] = min;
             });
         }
-        
+
         //每次更新当前所有点的深度值，即该点到球心的值
         buffer.SetData(data);
 
@@ -148,5 +151,39 @@ public class ShaderHelperBase : MonoBehaviour
     {
         buffer.Release();
         texture.Release();
+    }
+
+    protected void SaveRenderTexture(string fileName)
+    {
+        string directory = $@"SnapShots/{DateTime.Now:yyyyMMdd}/{DateTime.Now:HHmmss}";
+        Directory.CreateDirectory(directory);
+
+        string path = directory + $"/{fileName}.png";
+        SaveRenderTextureToPNG(this.texture, path);
+    }
+
+    protected void SaveRenderTexture(RenderTexture texture, string fileName)
+    {
+        string directory = $@"SnapShots/{DateTime.Now:yyyyMMdd}/{DateTime.Now:HHmmss}";
+        Directory.CreateDirectory(directory);
+
+        string path = directory + $"/{fileName}.png";
+        SaveRenderTextureToPNG(texture, path);
+    }
+
+    private void SaveRenderTextureToPNG(RenderTexture renderTexture, string path)
+    {
+        int width = renderTexture.width;
+        int height = renderTexture.height;
+        Texture2D texture2D = new Texture2D(width, height, TextureFormat.ARGB32, false);
+        RenderTexture.active = renderTexture;
+        texture2D.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        texture2D.Apply();
+        byte[] vs = texture2D.EncodeToPNG();
+
+        FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
+        fileStream.Write(vs, 0, vs.Length);
+        fileStream.Dispose();
+        fileStream.Close();
     }
 }
