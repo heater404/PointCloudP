@@ -21,6 +21,12 @@ public class MainCameraCtrl : MonoBehaviour
     public RangeSlider DepthRange;
     public BoxCollider PointCloudBox;
     public Vector3 PointCloudCenter { get; set; }
+
+    void Awake()
+    {
+
+    }
+
     void Start()
     {
         foreach (var reset in ResetBtns)
@@ -69,16 +75,23 @@ public class MainCameraCtrl : MonoBehaviour
         }
 
         PointCloudCenter = PointCloudBox.center;
+
         DepthRange.OnValueChanged.AddListener((l, h) =>
         {
+            var delta = (l + h) / 2 - PointCloudCenter.z;
+            PointCloudCenter = new Vector3(PointCloudCenter.x, PointCloudCenter.y, (l + h) / 2);
+
             if (Camera.main.cullingMask == 1 << LayerMask.NameToLayer("PointCloud"))
             {
-                var delta = (l + h) / 2 - PointCloudCenter.z;
-
-                PointCloudCenter = new Vector3(PointCloudCenter.x, PointCloudCenter.y, (l + h) / 2);
-
                 var originPos = Camera.main.transform.position;
                 Camera.main.transform.position = new Vector3(originPos.x, originPos.y, originPos.z + delta);
+            }
+            else
+            {
+                var camera = GetCameraParams("PointCloud");
+                var originPos = camera.Position;
+
+                camera.Position = new Vector3(originPos.x, originPos.y, originPos.z + delta);
             }
         });
     }
@@ -157,11 +170,6 @@ public class MainCameraCtrl : MonoBehaviour
             paras.EulerAngles = Camera.main.transform.eulerAngles;
             paras.Size = Camera.main.orthographicSize;
         }
-    }
-
-    void Awake()
-    {
-
     }
 }
 
