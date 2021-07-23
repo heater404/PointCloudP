@@ -7,7 +7,7 @@ using System.Linq;
 
 public class MainCameraCtrl : MonoBehaviour
 {
-    public List<CameraParams> CamerasParams { get; set; } = new List<CameraParams>();
+    public List<CameraParams> CurrentCamerasParams { get; set; } = new List<CameraParams>();
     public Button MainViewBtn;
     public Button TopViewBtn;
     public Button SideViewBtn;
@@ -22,38 +22,33 @@ public class MainCameraCtrl : MonoBehaviour
     public BoxCollider PointCloudBox;
     public Vector3 PointCloudCenter { get; set; }
 
-    void Awake()
-    {
-
-    }
-
     void Start()
     {
         foreach (var reset in ResetBtns)
         {
-            reset.onClick.AddListener(ResetCurrentCameraParam);
+            reset.onClick.AddListener(ResetToOriginCameraParam);
         }
 
         MainViewBtn.onClick.AddListener(() =>
         {
-            var camera = GetCurrentMiniViewCamera();
-            Camera.main.transform.position = camera.transform.position;
-            Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+            var camera = GetCameraParams();
+            Camera.main.transform.position = camera.Position;
+            Camera.main.transform.eulerAngles = camera.EulerAngles;
         });
 
         TopViewBtn.onClick.AddListener(() =>
         {
-            var camera = GetCurrentMiniViewCamera();
-            Camera.main.transform.position = camera.transform.position;
-            Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+            var camera = GetCameraParams();
+            Camera.main.transform.position = camera.Position;
+            Camera.main.transform.eulerAngles = camera.EulerAngles;
             Camera.main.transform.RotateAround(PointCloudCenter, Vector3.right, 90);
         });
 
         SideViewBtn.onClick.AddListener(() =>
         {
-            var camera = GetCurrentMiniViewCamera();
-            Camera.main.transform.position = camera.transform.position;
-            Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
+            var camera = GetCameraParams();
+            Camera.main.transform.position = camera.Position;
+            Camera.main.transform.eulerAngles = camera.EulerAngles;
             Camera.main.transform.RotateAround(PointCloudCenter, Vector3.up, 90);
 
         });
@@ -70,7 +65,7 @@ public class MainCameraCtrl : MonoBehaviour
                     Size = Camera.allCameras[i].orthographicSize,
                     Layer = (int)Mathf.Log(Camera.allCameras[i].cullingMask, 2),
                 };
-                CamerasParams.Add(camera);
+                CurrentCamerasParams.Add(camera);
             }
         }
 
@@ -78,22 +73,28 @@ public class MainCameraCtrl : MonoBehaviour
 
         DepthRange.OnValueChanged.AddListener((l, h) =>
         {
-            var delta = (l + h) / 2 - PointCloudCenter.z;
-            PointCloudCenter = new Vector3(PointCloudCenter.x, PointCloudCenter.y, (l + h) / 2);
-
-            if (Camera.main.cullingMask == 1 << LayerMask.NameToLayer("PointCloud"))
-            {
-                var originPos = Camera.main.transform.position;
-                Camera.main.transform.position = new Vector3(originPos.x, originPos.y, originPos.z + delta);
-            }
-            else
-            {
-                var camera = GetCameraParams("PointCloud");
-                var originPos = camera.Position;
-
-                camera.Position = new Vector3(originPos.x, originPos.y, originPos.z + delta);
-            }
+            SetPointCloudCenter(l, h);
         });
+        SetPointCloudCenter(DepthRange.LowValue, DepthRange.HighValue);
+    }
+
+    private void SetPointCloudCenter(float l, float h)
+    {
+        var delta = (l + h) / 2 - PointCloudCenter.z;
+        PointCloudCenter = new Vector3(PointCloudCenter.x, PointCloudCenter.y, (l + h) / 2);
+
+        if (Camera.main.cullingMask == 1 << LayerMask.NameToLayer("PointCloud"))
+        {
+            var originPos = Camera.main.transform.position;
+            Camera.main.transform.position = new Vector3(originPos.x, originPos.y, originPos.z + delta);
+        }
+        else
+        {
+            var camera = GetCameraParams("PointCloud");
+            var originPos = camera.Position;
+
+            camera.Position = new Vector3(originPos.x, originPos.y, originPos.z + delta);
+        }
     }
 
     // Update is called once per frame
@@ -107,69 +108,73 @@ public class MainCameraCtrl : MonoBehaviour
             (x.HasValue ? x.Value : 0, y.HasValue ? y.Value : 0, w.HasValue ? w.Value : 1, h.HasValue ? h.Value : 1);
     }
 
-    public void ResetCurrentCameraParam()
+    private void ResetToOriginCameraParam()
     {
-        var camera = GetCurrentMiniViewCamera();
-        Camera.main.transform.position = camera.transform.position;
-        Camera.main.transform.eulerAngles = camera.transform.eulerAngles;
-        Camera.main.orthographicSize = camera.orthographicSize;
-
+        SetMainCameraParam(GetMiniCameraParams());
     }
 
-    private CameraParams GetCameraParams(string layerName)
+
+    private CameraParams GetMiniCameraParams()
     {
-        var layer = LayerMask.NameToLayer(layerName);
-        var paras = CamerasParams.Find(param => param.Layer == layer);
-        return paras;
+        var layer = (int)Mathf.Log(Camera.main.cullingMask, 2);
+
+        return GetMiniCameraParams(LayerMask.LayerToName(layer));
     }
 
-    private CameraParams GetCameraParams(int layer)
+    private CameraParams GetMiniCameraParams(string targetLayer)
     {
-        var paras = CamerasParams.Find(param => param.Layer == layer);
-        return paras;
-    }
+        var camera = Camera.allCameras.Single(c => LayerMask.NameToLayer(targetLayer) == (int)Mathf.Log(c.cullingMask, 2)
+         && c != Camera.main);
 
-    Camera GetCurrentMiniViewCamera()
-    {
-        var count = Camera.allCamerasCount;
-        for (int i = 0; i < count; i++)
+        return new CameraParams
         {
-            if (Camera.allCameras[i] != Camera.main)//非MainCamera
-            {
-                var camera = Camera.allCameras[i];
-                if (camera.cullingMask == Camera.main.cullingMask)
-                {
-                    return camera;
-                }
-            }
-        }
-
-        return null;
+            Position = camera.transform.position,
+            EulerAngles = camera.transform.eulerAngles,
+            Size = camera.orthographicSize,
+            Layer = LayerMask.NameToLayer(targetLayer),
+        };
     }
 
-    public void SetCameraParam(string targetLayer)
+    public void SetMainCameraParam(string targetLayer)
     {
-        SaveCurrentCameraParam();
+        SaveMainCameraParam();
 
         var paras = GetCameraParams(targetLayer);
 
+        SetMainCameraParam(paras);
+    }
+
+    private void SetMainCameraParam(CameraParams paras)
+    {
         Camera.main.transform.position = paras.Position;
         Camera.main.transform.eulerAngles = paras.EulerAngles;
         Camera.main.orthographicSize = paras.Size;
         Camera.main.cullingMask = 1 << paras.Layer;
     }
 
-    private void SaveCurrentCameraParam()
+    private void SaveMainCameraParam()
     {
-        var currentLayer = (int)Mathf.Log(Camera.main.cullingMask, 2);
-
-        var paras = GetCameraParams(currentLayer);
+        var paras = GetCameraParams();
         if (paras != null)
         {
             paras.Position = Camera.main.transform.position;
             paras.EulerAngles = Camera.main.transform.eulerAngles;
             paras.Size = Camera.main.orthographicSize;
         }
+    }
+
+    private CameraParams GetCameraParams(string layerName)
+    {
+        var layer = LayerMask.NameToLayer(layerName);
+        var paras = CurrentCamerasParams.Find(param => param.Layer == layer);
+        return paras;
+    }
+
+    private CameraParams GetCameraParams()
+    {
+        var layer = (int)Mathf.Log(Camera.main.cullingMask, 2);
+        var paras = CurrentCamerasParams.Find(param => param.Layer == layer);
+        return paras;
     }
 }
 

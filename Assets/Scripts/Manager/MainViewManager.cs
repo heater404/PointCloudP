@@ -27,7 +27,7 @@ public class MainViewManager : MonoBehaviour
     void SwitchToView(string name)
     {
         var Layer = LayerMask.NameToLayer(name);
-        Camera.main.GetComponent<MainCameraCtrl>().SetCameraParam(name);//开启layer层
+        Camera.main.GetComponent<MainCameraCtrl>().SetMainCameraParam(name);//开启layer层
 
         GameObject.Find("Manager").GetComponent<UIManager>().SetActive(Layer);
     }

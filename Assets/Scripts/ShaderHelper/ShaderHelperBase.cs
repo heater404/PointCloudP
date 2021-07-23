@@ -20,6 +20,9 @@ public class ShaderHelperBase : MonoBehaviour
     public Toggle AutoRangeToggle;
     public Toggle ConvergenceToggle;
     public string KernelName;
+
+    public Toggle HorizontalMirrorToggle;
+    public Toggle VerticalMirrorToggle;
     public string bufferDataUnit { get; protected set; }
     protected virtual void Awake()
     {
@@ -95,7 +98,8 @@ public class ShaderHelperBase : MonoBehaviour
 
         Shader.SetFloat("max", max);
         Shader.SetFloat("min", min);
-
+        Shader.SetBool("horizontalMirro", HorizontalMirrorToggle.isOn);
+        Shader.SetBool("verticalMirro", VerticalMirrorToggle.isOn);
         //启动计算，并设置使用的线管组数量
         uint x, y, z;
         Shader.GetKernelThreadGroupSizes(kernel, out x, out y, out z);
