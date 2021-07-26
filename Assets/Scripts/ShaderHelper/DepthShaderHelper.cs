@@ -20,9 +20,10 @@ public class DepthShaderHelper : ShaderHelperBase
         base.Awake();
         Save.onClick.AddListener(() =>
         {
-            SaveRenderTexture("Depth");
+            SaveRenderTexture(this.texture, "Depth");
 
-            var camera = Camera.allCameras.First(c => (int)Mathf.Log(c.cullingMask, 2) == LayerMask.NameToLayer("PointCloud"));
+            var camera = Camera.allCameras.First(c => (int)Mathf.Log(c.cullingMask, 2) == LayerMask.NameToLayer("PointCloud")
+            && c != Camera.main);
             SaveRenderTexture(camera.activeTexture, "PointCloud");
         });
 

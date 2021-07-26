@@ -153,19 +153,11 @@ public class ShaderHelperBase : MonoBehaviour
         texture.Release();
     }
 
-    protected void SaveRenderTexture(string fileName)
-    {
-        string directory = $@"SnapShots/{DateTime.Now:yyyyMMdd}/{DateTime.Now:HHmmss}";
-        Directory.CreateDirectory(directory);
-
-        string path = directory + $"/{fileName}.png";
-        SaveRenderTextureToPNG(this.texture, path);
-    }
-
     protected void SaveRenderTexture(RenderTexture texture, string fileName)
     {
         string directory = $@"SnapShots/{DateTime.Now:yyyyMMdd}/{DateTime.Now:HHmmss}";
-        Directory.CreateDirectory(directory);
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
 
         string path = directory + $"/{fileName}.png";
         SaveRenderTextureToPNG(texture, path);

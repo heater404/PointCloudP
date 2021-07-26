@@ -3682,7 +3682,6 @@ MonoBehaviour:
   Top: {fileID: 912480535}
   Right: {fileID: 388210668}
   Bottom: {fileID: 2058529448}
-  Save: {fileID: 769760285}
   DepthRange: {fileID: 1909954038}
   PointCloudBox: {fileID: 937783128}
 --- !u!124 &618422847

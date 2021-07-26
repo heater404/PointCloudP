@@ -8,7 +8,7 @@ public class GrayShaderHelper : ShaderHelperBase
 {
     protected override void Start()
     {
-        Save.onClick.AddListener(() => SaveRenderTexture("Gray"));
+        Save.onClick.AddListener(() => SaveRenderTexture(this.texture,"Gray"));
         Shader.SetFloat("vMax", GrayColorBar.VMax);
         base.Start();
         bufferDataUnit = "LSB";
