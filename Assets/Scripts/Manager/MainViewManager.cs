@@ -13,14 +13,17 @@ public class MainViewManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var toggle = Parent.GetChild(i).GetComponent<Toggle>();
-            toggle.onValueChanged.AddListener(value =>
+            if (null != toggle)
             {
-                if (value)
+                toggle.onValueChanged.AddListener(value =>
                 {
-                    SwitchToView(toggle.gameObject.name);
-                }
-            });
-            toggles.Add(toggle);
+                    if (value)
+                    {
+                        SwitchToView(toggle.gameObject.name);
+                    }
+                });
+                toggles.Add(toggle);
+            }
         }
     }
 

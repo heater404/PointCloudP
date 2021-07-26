@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class PointCloudUserEvents : UserEventBase
 {
-
     // Start is called before the first frame update
     void Start()
     {
@@ -32,5 +31,10 @@ public class PointCloudUserEvents : UserEventBase
     protected override void OnLeftMouseButtonClick(Vector3 localPoint, PixelInfoStatus status = PixelInfoStatus.Active)
     {
 
+    }
+
+    protected override void OnLeftControlAddLeftMouseButtonClick(Vector2Int pixelSN)
+    {
+        
     }
 }

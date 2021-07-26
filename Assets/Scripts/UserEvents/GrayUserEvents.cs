@@ -9,6 +9,12 @@ public class GrayUserEvents : UserEventBase
         base.Awake();
         this.gameObject.transform.localScale = new Vector3(comm.PixelWidth / (comm.PixelHeight * 1.0f), 1, 1);
     }
+
+    protected override void OnLeftControlAddLeftMouseButtonClick(Vector2Int pixelSN)
+    {
+        Debug.Log($"pixelSN:{pixelSN}");
+    }
+
     protected override void OnLeftMouseButtonDrag(Vector3 localPointStart, Vector3 localPointEnd)
     {
         

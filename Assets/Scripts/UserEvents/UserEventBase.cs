@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,12 +10,12 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
     protected Communication comm;
     protected float scaleSpeed = 0.19f;//±‹√‚≥ˆœ÷¡„
     protected float moveSpeed = 0.003f;
-    protected ShaderHelperBase helper;
+    public ShaderHelperBase Helper { get; private set; }
     // Start is called before the first frame update
     protected virtual void Awake()
     {
         comm = GameObject.Find("Manager").GetComponent<Communication>();
-        helper = this.gameObject.GetComponent<ShaderHelperBase>();
+        Helper = this.gameObject.GetComponent<ShaderHelperBase>();
     }
 
     protected virtual void OnMouseScroll(Vector2 scrollDelta)
@@ -37,8 +38,7 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
 
     protected virtual void OnLeftMouseButtonClick(Vector3 localPoint, PixelInfoStatus status = PixelInfoStatus.Active)
     {
-        Vector2Int sn = LocalPointToPixelSN(localPoint);
-        ToolTipManager.Instance().ShowPixelInfo(helper.GetBufferData, helper.bufferDataUnit, localPoint, this.gameObject, status);
+        ToolTipManager.Instance().ShowPixelInfo(Helper.GetBufferData, Helper.bufferDataUnit, localPoint, this.gameObject, status);
     }
 
     protected Vector2Int LocalPointToPixelSN(Vector3 localPoint)
@@ -91,12 +91,19 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        Vector3 localPoint = this.gameObject.transform.InverseTransformPoint(
+                eventData.pointerCurrentRaycast.worldPosition);
         if (eventData.button == PointerEventData.InputButton.Left
            && eventData.clickCount == 1 && !eventData.dragging)
         {
-            Vector3 localPoint = this.gameObject.transform.InverseTransformPoint(
-                eventData.pointerCurrentRaycast.worldPosition);
             OnLeftMouseButtonClick(localPoint);
         }
+
+        if (eventData.button == PointerEventData.InputButton.Left && Input.GetKey(KeyCode.LeftControl))
+        {
+            OnLeftControlAddLeftMouseButtonClick(LocalPointToPixelSN(localPoint));
+        }
     }
+
+    protected abstract void OnLeftControlAddLeftMouseButtonClick(Vector2Int pixelSN);
 }
