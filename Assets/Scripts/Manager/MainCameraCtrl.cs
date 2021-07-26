@@ -33,14 +33,14 @@ public class MainCameraCtrl : MonoBehaviour
 
         MainViewBtn.onClick.AddListener(() =>
         {
-            var camera = GetCameraParams();
+            var camera = GetMiniCameraParams();
             Camera.main.transform.position = camera.Position;
             Camera.main.transform.eulerAngles = camera.EulerAngles;
         });
 
         TopViewBtn.onClick.AddListener(() =>
         {
-            var camera = GetCameraParams();
+            var camera = GetMiniCameraParams();
             Camera.main.transform.position = camera.Position;
             Camera.main.transform.eulerAngles = camera.EulerAngles;
             Camera.main.transform.RotateAround(PointCloudCenter, Vector3.right, 90);
@@ -48,7 +48,7 @@ public class MainCameraCtrl : MonoBehaviour
 
         SideViewBtn.onClick.AddListener(() =>
         {
-            var camera = GetCameraParams();
+            var camera = GetMiniCameraParams();
             Camera.main.transform.position = camera.Position;
             Camera.main.transform.eulerAngles = camera.EulerAngles;
             Camera.main.transform.RotateAround(PointCloudCenter, Vector3.up, 90);
