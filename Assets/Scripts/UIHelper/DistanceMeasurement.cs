@@ -123,7 +123,7 @@ public class DistanceMeasurement : BaseMeshEffect, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Right)
+        if (eventData.button == PointerEventData.InputButton.Left && Input.GetKey(KeyCode.LeftControl))
         {
             ToolTipManager.Instance().DestoryDistanceInfo();
         }

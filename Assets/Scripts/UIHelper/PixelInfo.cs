@@ -111,14 +111,14 @@ public class PixelInfo : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
             if (this.status == PixelInfoStatus.Active)
                 this.Status = PixelInfoStatus.Fix;
             else
                 this.Status = PixelInfoStatus.Active;
         }
-        else if (eventData.button == PointerEventData.InputButton.Right)
+        else if (eventData.button == PointerEventData.InputButton.Left && Input.GetKey(KeyCode.LeftControl))
         {
             manager.DestoryOnePixelInfo(this.gameObject);
         }
