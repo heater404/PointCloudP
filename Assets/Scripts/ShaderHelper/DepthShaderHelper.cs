@@ -18,19 +18,10 @@ public class DepthShaderHelper : ShaderHelperBase
     protected override void Awake()
     {
         base.Awake();
-        Save.onClick.AddListener(() =>
-        {
-            SaveRenderTexture(this.texture, "Depth");
-
-            var camera = Camera.allCameras.First(c => (int)Mathf.Log(c.cullingMask, 2) == LayerMask.NameToLayer("PointCloud")
-            && c != Camera.main);
-            SaveRenderTexture(camera.activeTexture, "PointCloud");
-        });
-
-        coefficient = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 12);//Vector3
-        pointsBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 12);//Vector3;
-        colorBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 16);//Color;rgba四个float组成
-        confidenceBuffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 4);
+        coefficient = new ComputeBuffer(Comm.PixelWidth * Comm.PixelHeight, 12);//Vector3
+        pointsBuffer = new ComputeBuffer(Comm.PixelWidth * Comm.PixelHeight, 12);//Vector3;
+        colorBuffer = new ComputeBuffer(Comm.PixelWidth * Comm.PixelHeight, 16);//Color;rgba四个float组成
+        confidenceBuffer = new ComputeBuffer(Comm.PixelWidth * Comm.PixelHeight, 4);
         bufferDataUnit = "mm";
     }
 
@@ -53,7 +44,7 @@ public class DepthShaderHelper : ShaderHelperBase
         float[] depth;
         while (true)
         {
-            if (comm.DepthFrames.TryDequeue(out depth))
+            if (Comm.DepthFrames.TryDequeue(out depth))
             {
                 SetConfidenceBuffer();
                 Dispatch(depth);
@@ -68,7 +59,7 @@ public class DepthShaderHelper : ShaderHelperBase
     private void SetConfidenceBuffer()
     {
         float[] confidence;
-        if (comm.ConfidenceFrames.TryDequeue(out confidence))
+        if (Comm.ConfidenceFrames.TryDequeue(out confidence))
             confidenceBuffer.SetData(confidence);
 
         Shader.SetFloat("confidenceT", Confidences.value);
@@ -76,19 +67,26 @@ public class DepthShaderHelper : ShaderHelperBase
 
     public override Vector3 GetPointData(Vector2Int position)
     {
-        Vector3[] array = new Vector3[comm.PixelWidth * comm.PixelHeight];
-        pointsBuffer.GetData(array);
+        Vector3[] array = GetPointData();
 
         var x = position.x;
         var y = position.y;
         if (HorizontalMirrorToggle.isOn)
-            x = comm.PixelWidth - x - 1;
+            x = Comm.PixelWidth - x - 1;
         if (VerticalMirrorToggle.isOn)
-            y = comm.PixelHeight - y - 1;
+            y = Comm.PixelHeight - y - 1;
 
-        var sn = comm.PixelWidth * y + x;
+        var sn = Comm.PixelWidth * y + x;
 
         return array[sn];
+    }
+
+    public Vector3[] GetPointData()
+    {
+        Vector3[] array = new Vector3[Comm.PixelWidth * Comm.PixelHeight];
+        pointsBuffer.GetData(array);
+
+        return array;
     }
 
     protected override void OnDestroy()

@@ -8,7 +8,6 @@ public class GrayShaderHelper : ShaderHelperBase
 {
     protected override void Start()
     {
-        Save.onClick.AddListener(() => SaveRenderTexture(this.texture,"Gray"));
         Shader.SetFloat("vMax", GrayColorBar.VMax);
         base.Start();
         bufferDataUnit = "LSB";
@@ -19,7 +18,7 @@ public class GrayShaderHelper : ShaderHelperBase
         float[] data;
         while (true)
         {
-            if (comm.GrayFrames.TryDequeue(out data))
+            if (Comm.GrayFrames.TryDequeue(out data))
                 Dispatch(data);
             else
                 yield return null;

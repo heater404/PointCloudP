@@ -12,9 +12,9 @@ public class ShaderHelperBase : MonoBehaviour
 {
     public ComputeShader Shader; //GPU计算Shader
     protected int kernel;//m_CShader中指定的一个计算函数入口编号
-    protected RenderTexture texture;//相位图渲染使用的纹理，该纹理各点的颜色由该点的相位值决定
-    protected ComputeBuffer buffer;//输入的各点当前到球心的距离值，球心就是摄像机的位置，摄像机采集的各点的相位值即可转化为距离值，即深度信息
-    protected Communication comm;
+    public RenderTexture Texture { get; private set; }
+    protected ComputeBuffer buffer;
+    public Communication Comm { get; private set; }
 
     protected float min;
     protected float max;
@@ -23,7 +23,6 @@ public class ShaderHelperBase : MonoBehaviour
     public Toggle AutoRangeToggle;
     public Toggle ConvergenceToggle;
     public string KernelName;
-    public Button Save;
     public Toggle HorizontalMirrorToggle;
     public Toggle VerticalMirrorToggle;
     public string bufferDataUnit { get; protected set; }
@@ -32,7 +31,7 @@ public class ShaderHelperBase : MonoBehaviour
         if (!IsSupport())
             return;
 
-        comm = GameObject.Find("Manager").GetComponent<Communication>();
+        Comm = GameObject.Find("Manager").GetComponent<Communication>();
         Slider.OnValueChanged.AddListener((min, max) =>
         {
             OnThresholdChanged(min, max);
@@ -41,25 +40,25 @@ public class ShaderHelperBase : MonoBehaviour
         ///创建各shader中需要使用的空间
         ///（这里我觉得应该说是定义可能更准确，因为这些空间都不是在CPU的内存中，而是在GPU中）
         kernel = Shader.FindKernel(KernelName);
-        buffer = new ComputeBuffer(comm.PixelWidth * comm.PixelHeight, 4);//float;
-        texture = new RenderTexture(comm.PixelWidth, comm.PixelHeight, 24, RenderTextureFormat.ARGB32)
+        buffer = new ComputeBuffer(Comm.PixelWidth * Comm.PixelHeight, 4);//float;
+        Texture = new RenderTexture(Comm.PixelWidth, Comm.PixelHeight, 24, RenderTextureFormat.ARGB32)
         {
             enableRandomWrite = true
         };
-        texture.Create();
+        Texture.Create();
 
         MeshRenderer mr = GetComponent<MeshRenderer>();
-        mr.material.mainTexture = texture;
+        mr.material.mainTexture = Texture;
     }
     // Start is called before the first frame update
     protected virtual void Start()
     {
         //给m_CShader设置相应的数据
-        Shader.SetFloat("width", comm.PixelWidth);
-        Shader.SetFloat("height", comm.PixelHeight);
+        Shader.SetFloat("width", Comm.PixelWidth);
+        Shader.SetFloat("height", Comm.PixelHeight);
 
         Shader.SetBuffer(kernel, "buffer", buffer);
-        Shader.SetTexture(kernel, "renderTexture", texture);
+        Shader.SetTexture(kernel, "renderTexture", Texture);
 
         StartCoroutine(MonitorUpdate());
     }
@@ -106,7 +105,7 @@ public class ShaderHelperBase : MonoBehaviour
         //启动计算，并设置使用的线管组数量
         uint x, y, z;
         Shader.GetKernelThreadGroupSizes(kernel, out x, out y, out z);
-        Shader.Dispatch(kernel, comm.PixelWidth / (int)x, comm.PixelHeight / (int)y, 1 / (int)z);
+        Shader.Dispatch(kernel, Comm.PixelWidth / (int)x, Comm.PixelHeight / (int)y, 1 / (int)z);
     }
 
     private void OnThresholdChanged(float min, float max)
@@ -117,23 +116,22 @@ public class ShaderHelperBase : MonoBehaviour
 
     public float[] GetBufferData()
     {
-        float[] array = new float[comm.PixelWidth * comm.PixelHeight];
+        float[] array = new float[Comm.PixelWidth * Comm.PixelHeight];
         buffer.GetData(array);
         return array;
     }
 
     public float GetBufferData(Vector2Int position)
     {
-        float[] array = new float[comm.PixelWidth * comm.PixelHeight];
-        buffer.GetData(array);
+        float[] array = GetBufferData();
         var x = position.x;
         var y = position.y;
         if (HorizontalMirrorToggle.isOn)
-            x = comm.PixelWidth - x - 1;
+            x = Comm.PixelWidth - x - 1;
         if (VerticalMirrorToggle.isOn)
-            y = comm.PixelHeight - y - 1;
+            y = Comm.PixelHeight - y - 1;
 
-        var sn = comm.PixelWidth * y + x;
+        var sn = Comm.PixelWidth * y + x;
 
         return array[sn];
     }
@@ -150,32 +148,8 @@ public class ShaderHelperBase : MonoBehaviour
     protected virtual void OnDestroy()
     {
         buffer.Release();
-        texture.Release();
+        Texture.Release();
     }
 
-    protected void SaveRenderTexture(RenderTexture texture, string fileName)
-    {
-        string directory = $@"SnapShots/{DateTime.Now:yyyyMMdd}/{DateTime.Now:HHmmss}";
-        if (!Directory.Exists(directory))
-            Directory.CreateDirectory(directory);
 
-        string path = directory + $"/{fileName}.png";
-        SaveRenderTextureToPNG(texture, path);
-    }
-
-    private void SaveRenderTextureToPNG(RenderTexture renderTexture, string path)
-    {
-        int width = renderTexture.width;
-        int height = renderTexture.height;
-        Texture2D texture2D = new Texture2D(width, height, TextureFormat.ARGB32, false);
-        RenderTexture.active = renderTexture;
-        texture2D.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-        texture2D.Apply();
-        byte[] vs = texture2D.EncodeToPNG();
-
-        FileStream fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
-        fileStream.Write(vs, 0, vs.Length);
-        fileStream.Dispose();
-        fileStream.Close();
-    }
 }
