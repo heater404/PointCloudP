@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,7 @@ public class ShaderHelperBase : MonoBehaviour
     protected int kernel;//m_CShader中指定的一个计算函数入口编号
     public RenderTexture Texture { get; private set; }
     protected ComputeBuffer buffer;
+    protected float[] bufferData;
     public Communication Comm { get; private set; }
 
     protected float min;
@@ -97,7 +99,6 @@ public class ShaderHelperBase : MonoBehaviour
 
         //每次更新当前所有点的深度值，即该点到球心的值
         buffer.SetData(data);
-
         Shader.SetFloat("max", max);
         Shader.SetFloat("min", min);
         Shader.SetBool("horizontalMirro", HorizontalMirrorToggle.isOn);
@@ -124,6 +125,7 @@ public class ShaderHelperBase : MonoBehaviour
     public float GetBufferData(Vector2Int position)
     {
         float[] array = GetBufferData();
+
         var x = position.x;
         var y = position.y;
         if (HorizontalMirrorToggle.isOn)

@@ -74,7 +74,7 @@ public class SaveRawData : MonoBehaviour
                     //写一行
                     for (int i = 0; i < width; i++)
                     {
-                        sw.Write(data[j * height + i] + ",");
+                        sw.Write(data[j * width + i] + ",");
                     }
                     sw.WriteLine();//一行结束后换行
                 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -30,6 +31,31 @@ public class Communication : MonoBehaviour
     private void OnDestroy()
     {
         this.Close();
+    }
+
+    private float[] GetDataFromCsv(string path, out int width, out int height)
+    {
+        List<float> data = new List<float>();
+        width = 0;
+        height = 0;
+        using (StreamReader sr = new StreamReader(path))
+        {
+            do
+            {
+                var strs = sr.ReadLine();
+                if (strs != null)
+                {
+                    var datas = strs.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    width = datas.Length;
+                    height++;
+                    for (int i = 0; i < datas.Length; i++)
+                    {
+                        data.Add(float.Parse(datas[i]));
+                    }
+                }
+            } while (!sr.EndOfStream);
+        }
+        return data.ToArray();
     }
 
     private Communication()
