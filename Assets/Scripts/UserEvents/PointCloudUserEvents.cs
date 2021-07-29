@@ -10,17 +10,17 @@ public class PointCloudUserEvents : UserEventBase
         //center = this.gameObject.GetComponent<PointCloud>().PointCloudCenter;
         base.scaleSpeed = 200.1f;//±‹√‚≥ˆœ÷0
         base.moveSpeed = 0.2f;
-        
+
     }
 
     protected override void OnRightMouseButtonDrag(Vector3 pointDelta)
     {
         Vector3 center = Camera.main.GetComponent<MainCameraCtrl>().PointCloudCenter;
 
-        if (Mathf.Abs(pointDelta.x) > Mathf.Abs(pointDelta.y))
-            Camera.main.transform.RotateAround(center, Vector3.up, pointDelta.x * moveSpeed);
-        else
-            Camera.main.transform.RotateAround(center, Vector3.right, -pointDelta.y * moveSpeed);
+        //if (Mathf.Abs(pointDelta.x) > Mathf.Abs(pointDelta.y))
+        Camera.main.transform.RotateAround(center, Vector3.up, pointDelta.x * moveSpeed);
+        //else
+        Camera.main.transform.RotateAround(center, Vector3.right, -pointDelta.y * moveSpeed);
     }
 
     protected override void OnLeftMouseButtonDrag(Vector3 localPointStart, Vector3 localPointEnd)
@@ -35,6 +35,6 @@ public class PointCloudUserEvents : UserEventBase
 
     protected override void OnLeftControlAddLeftMouseButtonClick(Vector2Int pixelSN)
     {
-        
+
     }
 }
