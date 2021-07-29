@@ -69,11 +69,12 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
             {
                 Vector3 localPointStart = this.gameObject.transform.InverseTransformPoint(
                    eventData.pointerPressRaycast.worldPosition);
-                
+
                 if (Vector3.zero != eventData.pointerCurrentRaycast.worldPosition)
                 {
                     lastRaycastWorldPosition = eventData.pointerCurrentRaycast.worldPosition;
                 }
+
                 Vector3 localPointEnd = this.gameObject.transform.InverseTransformPoint(
                   lastRaycastWorldPosition);
 
