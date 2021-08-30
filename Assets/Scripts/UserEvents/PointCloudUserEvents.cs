@@ -37,4 +37,9 @@ public class PointCloudUserEvents : UserEventBase
     {
 
     }
+
+    protected override void OnLeftMouseButtonDrag(Vector2 delta)
+    {
+        Camera.main.transform.Translate(-delta * moveSpeed * 10);
+    }
 }

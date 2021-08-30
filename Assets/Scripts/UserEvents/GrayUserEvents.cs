@@ -19,4 +19,9 @@ public class GrayUserEvents : UserEventBase
     {
         
     }
+
+    protected override void OnLeftMouseButtonDrag(Vector2 delta)
+    {
+        
+    }
 }

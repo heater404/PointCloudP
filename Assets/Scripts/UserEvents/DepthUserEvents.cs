@@ -18,4 +18,9 @@ public class DepthUserEvents : UserEventBase
     {
         ToolTipManager.Instance().ShowDistanceInfo(Helper.GetPointData, Helper.GetBufferData, localPointStart, localPointEnd, this.gameObject);
     }
+
+    protected override void OnLeftMouseButtonDrag(Vector2 delta)
+    {
+        
+    }
 }

@@ -79,11 +79,13 @@ public abstract class UserEventBase : MonoBehaviour, IPointerClickHandler, IDrag
                   lastRaycastWorldPosition);
 
                 OnLeftMouseButtonDrag(localPointStart, localPointEnd);
+                OnLeftMouseButtonDrag(eventData.delta);
             }
         }
     }
 
     protected abstract void OnLeftMouseButtonDrag(Vector3 localPointStart, Vector3 localPointEnd);
+    protected abstract void OnLeftMouseButtonDrag(Vector2 delta);
 
     public void OnScroll(PointerEventData eventData)
     {
